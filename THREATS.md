@@ -35,3 +35,41 @@ Initial threat identification completed on Day 1.
 Threat mitigation, implementation, and security testing will be performed during the relevant development days.
 
 No security controls have been implemented yet.
+
+## Day 2 - Authentication Threats
+
+### Threat 1: Weak Password Storage
+Risk: Passwords may be exposed if stored in plain text.
+
+Mitigation: Werkzeug password hashing is used to store password hashes.
+
+Status: Implemented. Verify password hashes in the database.
+
+### Threat 2: Unauthorized Dashboard Access
+Risk: Unauthenticated users may attempt to access the dashboard.
+
+Mitigation: Flask-Login login_required decorator is used.
+
+Status: Implemented. Test direct dashboard access without login.
+
+### Threat 3: Broken Access Control
+Risk: A user may access another user's documents without permission.
+
+Mitigation: Document-level ownership and permission checks must be implemented.
+
+Status: Pending. Document sharing functionality is not implemented yet.
+
+### Threat 4: Brute Force Login
+Risk: An attacker may repeatedly attempt login using different passwords.
+
+Mitigation: Login rate limiting is required.
+
+Status: Not implemented. This risk is currently accepted during development and must be addressed before final submission.
+
+### Threat 5: Session Misuse
+Risk: An attacker may attempt to misuse an authenticated session.
+
+Mitigation: Flask-Login manages authentication sessions.
+
+Status: Partially implemented. Session cookie security and CSRF protection still require verification.
+
