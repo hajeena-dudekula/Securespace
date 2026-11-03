@@ -1,0 +1,292 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SecureSpace | Register</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(135deg, #eee6ff, #dce8ff);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 25px;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    min-height: 700px;
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    background: white;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(75, 45, 150, 0.2);
+}
+
+.brand-panel {
+    background: linear-gradient(145deg, #d9c7ff, #b5a1f5);
+    padding: 45px 35px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+}
+
+.logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #6d28d9, #35118a);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 48px;
+    font-weight: 800;
+}
+
+.brand-name {
+    font-size: 32px;
+    font-weight: 800;
+    color: #17134d;
+    margin-top: 15px;
+}
+
+.brand-name span {
+    color: #7629d8;
+}
+
+.tagline {
+    color: #443875;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.brand-panel h2 {
+    margin-top: 45px;
+    color: #17134d;
+    font-size: 29px;
+    line-height: 1.4;
+}
+
+.brand-panel h2 span {
+    color: #7629d8;
+}
+
+.illustration {
+    font-size: 100px;
+    margin: 30px 0;
+}
+
+.brand-description {
+    color: #443875;
+    line-height: 1.7;
+    max-width: 300px;
+}
+
+.form-panel {
+    padding: 45px 65px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.form-panel h1 {
+    font-size: 30px;
+    color: #17134d;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #77758a;
+    margin-bottom: 25px;
+}
+
+.input-group {
+    margin-bottom: 16px;
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    height: 55px;
+    border: 1px solid #ded9ec;
+    border-radius: 12px;
+    padding: 0 18px;
+    font-size: 15px;
+    outline: none;
+    background: white;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    border-color: #7629d8;
+    box-shadow: 0 0 0 3px #7629d81c;
+}
+
+.register-btn {
+    width: 100%;
+    height: 58px;
+    border: none;
+    border-radius: 35px;
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #7629dc, #4d19c7);
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 14px;
+    color: #59546d;
+}
+
+a {
+    text-decoration: none;
+    color: #7025d2;
+    font-weight: 600;
+}
+
+.flash-message {
+    background: #f5eaff;
+    color: #6425b8;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 15px;
+}
+
+@media(max-width: 850px) {
+    .container {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+    }
+
+    .brand-panel {
+        padding: 35px 25px;
+    }
+
+    .brand-panel h2 {
+        margin-top: 25px;
+        font-size: 25px;
+    }
+
+    .illustration {
+        font-size: 70px;
+        margin: 15px 0;
+    }
+
+    .form-panel {
+        padding: 40px 30px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <section class="brand-panel">
+
+        <div class="logo">S</div>
+
+        <div class="brand-name">
+            Secure<span>space</span>
+        </div>
+
+        <div class="tagline">
+            Share Â· Control Â· Audit
+        </div>
+
+        <h2>
+            Create Your<br>
+            <span>Secure Workspace.</span>
+        </h2>
+
+        <div class="illustration"></div>
+
+        <p class="brand-description">
+            Join SecureSpace and protect your documents
+            with controlled access and secure sharing.
+        </p>
+
+    </section>
+
+    <section class="form-panel">
+
+        <h1>Create Your Account</h1>
+
+        <p class="subtitle">
+            Start your secure document workspace
+        </p>
+
+        {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+                <div class="flash-message">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST">
+
+            <div class="input-group">
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="Choose a username"
+                    required
+                >
+            </div>
+
+            <div class="input-group">
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter your email address"
+                    required
+                >
+            </div>
+
+            <div class="input-group">
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Create a password"
+                    minlength="8"
+                    required
+                >
+            </div>
+
+            <button class="register-btn" type="submit">
+                Create Account 
+            </button>
+
+        </form>
+
+        <div class="login-link">
+            Already have an account
+            <a href="{{ url_for('auth.login') }}">Login</a>
+        </div>
+
+    </section>
+
+</div>
+
+</body>
+</html>
+

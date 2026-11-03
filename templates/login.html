@@ -1,0 +1,387 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SecureSpace | Login</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(135deg, #eee6ff, #dce8ff);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 25px;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 1200px;
+    min-height: 700px;
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    background: white;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(75, 45, 150, 0.2);
+}
+
+/* LEFT BRANDING */
+
+.brand-panel {
+    background: linear-gradient(145deg, #d9c7ff, #b5a1f5);
+    padding: 45px 35px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+}
+
+.logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #6d28d9, #35118a);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 48px;
+    font-weight: 800;
+    box-shadow: 0 10px 25px #6d28d955;
+}
+
+.brand-name {
+    font-size: 32px;
+    font-weight: 800;
+    color: #17134d;
+    margin-top: 15px;
+}
+
+.brand-name span {
+    color: #7629d8;
+}
+
+.tagline {
+    color: #443875;
+    font-size: 14px;
+    margin-top: 8px;
+    letter-spacing: 1px;
+}
+
+.brand-panel h2 {
+    margin-top: 45px;
+    color: #17134d;
+    font-size: 29px;
+    line-height: 1.4;
+}
+
+.brand-panel h2 span {
+    color: #7629d8;
+}
+
+.illustration {
+    font-size: 115px;
+    margin: 30px 0;
+    filter: drop-shadow(0 12px 12px #6b43a555);
+}
+
+.brand-description {
+    color: #443875;
+    line-height: 1.7;
+    max-width: 300px;
+}
+
+/* LOGIN FORM */
+
+.form-panel {
+    padding: 55px 65px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.welcome {
+    color: #6b28d9;
+    text-align: right;
+    font-size: 18px;
+    font-style: italic;
+    margin-bottom: 35px;
+}
+
+.form-panel h1 {
+    font-size: 30px;
+    color: #17134d;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #77758a;
+    margin-bottom: 30px;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.input-group input {
+    width: 100%;
+    height: 58px;
+    border: 1px solid #ded9ec;
+    border-radius: 12px;
+    padding: 0 18px;
+    font-size: 15px;
+    outline: none;
+    transition: 0.3s;
+}
+
+.input-group input:focus {
+    border-color: #7629d8;
+    box-shadow: 0 0 0 3px #7629d81c;
+}
+
+.options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px 0 25px;
+    font-size: 14px;
+}
+
+.remember {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    color: #45415e;
+}
+
+a {
+    text-decoration: none;
+    color: #7025d2;
+    font-weight: 600;
+}
+
+.login-btn {
+    width: 100%;
+    height: 58px;
+    border: none;
+    border-radius: 35px;
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #7629dc, #4d19c7);
+    cursor: pointer;
+    box-shadow: 0 8px 18px #7025d244;
+    transition: 0.3s;
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px #7025d255;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 25px 0;
+    color: #8b879d;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #e3deec;
+}
+
+.google-btn {
+    width: 100%;
+    height: 55px;
+    border: 1px solid #ded9ec;
+    background: white;
+    border-radius: 35px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.register-link {
+    text-align: center;
+    margin-top: 35px;
+    font-size: 14px;
+    color: #59546d;
+}
+
+.flash-message {
+    background: #f5eaff;
+    color: #6425b8;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width: 850px) {
+    .auth-container {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+    }
+
+    .brand-panel {
+        padding: 35px 25px;
+    }
+
+    .brand-panel h2 {
+        margin-top: 25px;
+        font-size: 25px;
+    }
+
+    .illustration {
+        font-size: 70px;
+        margin: 15px 0;
+    }
+
+    .form-panel {
+        padding: 40px 30px;
+    }
+}
+
+@media(max-width: 480px) {
+    body {
+        padding: 12px;
+    }
+
+    .form-panel {
+        padding: 30px 20px;
+    }
+
+    .form-panel h1 {
+        font-size: 25px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="auth-container">
+
+    <section class="brand-panel">
+
+        <div class="logo">S</div>
+
+        <div class="brand-name">
+            Secure<span>space</span>
+        </div>
+
+        <div class="tagline">
+            Share Â· Control Â· Audit
+        </div>
+
+        <h2>
+            Your Documents.<br>
+            <span>Our Priority.</span>
+        </h2>
+
+        <div class="illustration">
+            →→
+        </div>
+
+        <p class="brand-description">
+            Protect your documents, control access,
+            and share files securely with SecureSpace.
+        </p>
+
+    </section>
+
+    <section class="form-panel">
+
+        <div class="welcome">
+            Welcome Back!
+        </div>
+
+        <h1>Login to Securespace</h1>
+
+        <p class="subtitle">
+            Access your secure workspace
+        </p>
+
+        {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+                <div class="flash-message">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST">
+
+            <div class="input-group">
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="Enter your username"
+                    required
+                >
+            </div>
+
+            <div class="input-group">
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                >
+            </div>
+
+            <div class="options">
+
+                <label class="remember">
+                    <input type="checkbox" name="remember">
+                    Remember me
+                </label>
+
+                <a href="#">Forgot Password→</a>
+
+            </div>
+
+            <button class="login-btn" type="submit">
+                → Login
+            </button>
+
+        </form>
+
+        <div class="divider">
+            OR
+        </div>
+
+        <button class="google-btn" type="button">
+            Continue with Google
+        </button>
+
+        <div class="register-link">
+            Don't have an account→
+            <a href="{{ url_for('auth.register') }}">
+                Register →
+            </a>
+        </div>
+
+    </section>
+
+</div>
+
+</body>
+</html>
+

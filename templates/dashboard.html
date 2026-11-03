@@ -1,0 +1,146 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SecureSpace | Dashboard</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f4f5fb;
+    color: #1c1b3a;
+}
+
+.navbar {
+    background: white;
+    padding: 20px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 3px 15px #0000000a;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: 800;
+    color: #5426c7;
+}
+
+.logout {
+    background: #5426c7;
+    color: white;
+    padding: 11px 25px;
+    border-radius: 25px;
+    text-decoration: none;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 50px auto;
+    padding: 20px;
+}
+
+.welcome {
+    background: linear-gradient(120deg, #5426c7, #8261e8);
+    padding: 40px;
+    border-radius: 25px;
+    color: white;
+}
+
+.welcome h1 {
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.welcome p {
+    opacity: 0.9;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-top: 35px;
+}
+
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px #00000008;
+}
+
+.card h3 {
+    color: #5426c7;
+    margin-bottom: 15px;
+}
+
+.card p {
+    color: #777;
+    line-height: 1.6;
+}
+
+@media(max-width: 700px) {
+    .cards {
+        grid-template-columns: 1fr;
+    }
+
+    .navbar {
+        padding: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <div class="logo">SecureSpace</div>
+
+    <form method="POST" action="{{ url_for('auth.logout') }}">
+        <button class="logout" type="submit">Logout</button>
+    </form>
+</nav>
+
+<div class="container">
+
+    <section class="welcome">
+        <h1>Welcome, {{ username }}!</h1>
+
+        <p>
+            Your secure workspace is ready.
+            Manage your documents with confidence.
+        </p>
+    </section>
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>My Documents</h3>
+            <p>Access and manage your secure documents.</p>
+        </div>
+
+        <div class="card">
+            <h3>Access Control</h3>
+            <p>Your account role: {{ role }}</p>
+        </div>
+
+        <div class="card">
+            <h3>Security</h3>
+            <p>Your SecureSpace account is active.</p>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
