@@ -1,0 +1,156 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SecureSpace | Admin Activity</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f4f5fb;
+    color: #1c1b3a;
+}
+
+.navbar {
+    background: white;
+    padding: 20px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 3px 15px #0000000a;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: 800;
+    color: #5426c7;
+}
+
+.back {
+    background: #5426c7;
+    color: white;
+    padding: 11px 25px;
+    border-radius: 25px;
+    text-decoration: none;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.heading {
+    background: linear-gradient(120deg, #5426c7, #8261e8);
+    padding: 35px;
+    border-radius: 22px;
+    color: white;
+    margin-bottom: 30px;
+}
+
+.heading h1 {
+    margin-bottom: 10px;
+}
+
+.table-card {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    overflow-x: auto;
+    box-shadow: 0 5px 20px #00000008;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 850px;
+}
+
+th, td {
+    padding: 14px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+th {
+    color: #5426c7;
+    background: #f8f6ff;
+}
+
+.empty {
+    padding: 30px;
+    text-align: center;
+    color: #777;
+}
+
+@media(max-width: 700px) {
+    .navbar {
+        padding: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <div class="logo">SecureSpace | Admin</div>
+    <a class="back" href="{{ url_for('dashboard') }}">Dashboard</a>
+</nav>
+
+<div class="container">
+
+    <section class="heading">
+        <h1>Activity Dashboard</h1>
+        <p>Monitor recent document and permission activities.</p>
+        <p>Showing the latest 100 records.</p>
+    </section>
+
+    <section class="table-card">
+
+        {% if activities %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Actor ID</th>
+                    <th>Document ID</th>
+                    <th>Action</th>
+                    <th>Details</th>
+                    <th>IP Address</th>
+                    <th>Date & Time</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for activity in activities %}
+                <tr>
+                    <td>{{ activity.id }}</td>
+                    <td>{{ activity.actor_id or "System" }}</td>
+                    <td>{{ activity.document_id or "-" }}</td>
+                    <td>{{ activity.action }}</td>
+                    <td>{{ activity.details or "-" }}</td>
+                    <td>{{ activity.ip_address or "-" }}</td>
+                    <td>{{ activity.created_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <div class="empty">No activity records found.</div>
+        {% endif %}
+
+    </section>
+
+</div>
+
+</body>
+</html>

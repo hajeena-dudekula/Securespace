@@ -122,6 +122,12 @@ body {
     </section>
 
     <div class="cards">
+        <a href="{{ url_for('documents.upload_document') }}" style="text-decoration:none;color:inherit;">
+            <div class="card">
+                <h3>Upload Document</h3>
+                <p>Securely upload and store your files.</p>
+            </div>
+        </a>
 
         <div class="card">
             <h3>My Documents</h3>
@@ -138,9 +144,20 @@ body {
             <p>Your SecureSpace account is active.</p>
         </div>
 
+        {% if role == "admin" %}
+        <a href="{{ url_for('admin_activity') }}" style="text-decoration:none;color:inherit;">
+            <div class="card">
+                <h3>Admin Activity</h3>
+                <p>Monitor document and permission activities.</p>
+            </div>
+        </a>
+        {% endif %}
+
     </div>
 
 </div>
 
 </body>
 </html>
+
+

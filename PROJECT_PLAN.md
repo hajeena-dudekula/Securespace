@@ -1,141 +1,137 @@
-﻿# SecureSpace - Project Plan and Progress
-
-## Project Overview
-
-SecureSpace is a secure document-sharing platform designed to protect confidential documents and maintain a reliable audit trail of document activities.
-
-The platform allows users to upload, organize, search, manage, and share documents with specific individuals through document-level permissions.
-
-The system supports three roles: Administrator, Document Owner, and Viewer. Document owners can grant or revoke access to their documents, while administrators can monitor document activities and permission changes.
-
-SecureSpace ensures that documents are accessible only by authorized users. Every document operation is verified on the server, preventing unauthorized users from reading, downloading, modifying, or deleting documents.
-
-The platform maintains an audit trail of document uploads, downloads, modifications, deletions, and permission changes to provide accountability and traceability.
-
-The main objective is to build a document-sharing system where unauthorized users cannot access confidential documents and document activities can be verified through a reliable audit trail.
-
-## Technology Stack
-
-- Python
-- Flask
-- SQLite
-- HTML
-- CSS
-- JavaScript
-
-## Development Plan
-
-### Day 1 - Project Setup
-
-Tasks:
-- Created project structure.
-- Set up Python virtual environment.
-- Installed required dependencies.
-- Analyzed project requirements.
-- Selected technology stack.
-
-Status: Completed
-
-### Day 2 - User Authentication
-
-Tasks:
-- Implemented user registration.
-- Implemented user login and logout.
-- Added password hashing.
-- Created login and registration interfaces.
-- Created dashboard route.
-- Added authentication protection.
-
-Status: Completed
-
-### Day 3 - Document Management
-
-Tasks:
-- Implement secure document upload.
-- Validate uploaded files.
-- Store uploaded documents securely.
-- Display uploaded documents.
-- Organize documents using categories.
-- Implement document search.
-
-Status: Planned
-
-### Day 4 - Authorization and Audit Trail
-
-Tasks:
-- Implement Administrator, Document Owner, and Viewer roles.
-- Implement document-level read and edit permissions.
-- Allow document owners to grant access.
-- Allow document owners to revoke access.
-- Enforce authorization on every document operation.
-- Record document upload, download, modification, and deletion events.
-- Record permission changes.
-- Implement administrative activity view.
-
-Status: Planned
-
-### Day 5 - Deployment
-
-Tasks:
-- Deploy the Flask application.
-- Configure production database.
-- Configure environment variables and secret key.
-- Prepare seed data.
-- Create test accounts for all roles.
-- Verify the deployed application.
-- Update README with deployment instructions.
-
-Status: Planned
-
-### Day 6 - Security Testing
-
-Tasks:
-- Test unauthorized document access.
-- Test document download authorization.
-- Test document modification and deletion permissions.
-- Test permission revocation.
-- Test file upload validation.
-- Test audit trail functionality.
-- Implement automated security tests.
-- Fix identified security issues.
-
-Status: Planned
-
-### Day 7 - Final Review and Submission
-
-Tasks:
-- Review mandatory requirements.
-- Complete API documentation.
-- Verify database setup instructions.
-- Review PROMPTS.md.
-- Review THREATS.md.
-- Update README.
-- Prepare demo video.
-- Perform final testing.
-- Push final changes to GitHub.
-
-Status: Planned
-
-## Security Design Decisions
-
-- Authorization must be enforced on the server for every document operation.
-- Hiding buttons in the user interface is not authorization.
-- Document permissions must be checked before reading or downloading file contents.
-- Revoked permissions must stop working immediately.
-- Audit records must capture successful and denied access attempts.
-- AI suggestions must never grant permissions automatically.
-- Uploaded files must be validated before being stored.
-- Security tests must verify that unauthorized users cannot access another user's documents.
-
-## Current Progress
+﻿## Current Progress
 
 - Day 1: Project setup completed.
-- Day 2: Authentication implementation completed.
-- Day 3: Document management pending.
-- Day 4: Authorization and audit trail pending.
+- Day 2: User authentication implementation completed.
+- Day 3: Document management implementation completed.
+- Day 4: Document authorization, permissions, audit logging, admin activity, and bug fixes completed.
 - Day 5: Deployment planned.
 - Day 6: Security testing planned.
 - Day 7: Final review and submission planned.
+
+---
+
+## Day 3 – Document Management Implementation (Completed)
+
+### 1. Document Upload
+- Implemented document upload functionality using Flask.
+- Added support for PDF, DOCX, TXT, PNG, JPG, and JPEG files.
+- Implemented secure filename handling.
+- Generated unique stored filenames using UUID.
+- Configured document storage inside the application instance folder.
+- Added file extension validation.
+- Implemented file size restrictions based on file type.
+- Added upload success and error messages.
+
+### 2. Document Listing and Organization
+- Implemented document listing functionality.
+- Displayed uploaded document details.
+- Added document category support.
+- Implemented filename-based search.
+- Added category-based filtering.
+- Displayed upload timestamps in Indian Standard Time.
+- Implemented document ordering by upload date.
+
+### 3. Document Preview and Download
+- Implemented document preview route.
+- Implemented document download route.
+- Added login and document access checks.
+- Restricted unauthorized document access.
+
+### 4. Document Categories
+- Implemented General, Personal, Work, Education, and Finance categories.
+- Added category selection during upload.
+- Implemented category filtering.
+
+---
+
+## Day 4 – Document Security and Administration (Completed)
+
+**Date: November 4, 2026**
+
+### 1. Document Permission Management
+- Created DocumentPermission database model.
+- Implemented Read and Edit permission types.
+- Added document sharing with registered users.
+- Implemented permission granting through username.
+- Added validation for sharing permissions.
+- Prevented users from sharing their own documents with themselves.
+- Implemented permission updates for existing shares.
+- Implemented revoke document access functionality.
+- Added permission ownership and authorization checks.
+
+### 2. Document Access Control
+- Implemented centralized document access checking.
+- Added document owner access.
+- Added admin access.
+- Implemented shared document access for authorized users.
+- Restricted unauthorized preview and download requests.
+- Added Edit permission checks for document modifications.
+- Restricted document deletion to owners and admins.
+- Implemented shared document visibility in the document listing.
+
+### 3. Document Modification and Deletion
+- Implemented document category editing route.
+- Added authorization checks before modifying documents.
+- Implemented document deletion route.
+- Added authorization checks before deletion.
+- Handled audit logging safely during document deletion.
+- Deleted the database record before attempting physical file removal.
+
+### 4. Audit Logging System
+- Created AuditLog database model.
+- Added actor, document, action, details, IP address, and timestamp fields.
+- Implemented document upload activity logging.
+- Implemented document preview activity logging.
+- Implemented document download activity logging.
+- Implemented permission grant activity logging.
+- Implemented permission revocation activity logging.
+- Implemented document modification activity logging.
+- Implemented document deletion activity logging.
+
+### 5. Admin Activity Dashboard
+- Implemented admin activity route.
+- Added admin role verification.
+- Created templates/admin/activity.html.
+- Implemented display of recent audit activities.
+- Restricted activity page access to administrators.
+- Added admin activity link to the dashboard.
+
+### 6. Bug Fixes and Code Verification
+- Fixed category filtering issue.
+- Fixed document deletion foreign-key constraint issue.
+- Updated deletion audit logging to avoid foreign-key conflicts.
+- Verified Python syntax for app.py, routes/documents.py, and models/audit_log.py using py_compile.
+
+---
+
+## Day 5 – Deployment (Planned)
+
+- Prepare the application for deployment.
+- Configure production environment variables.
+- Configure production database.
+- Deploy the Flask application.
+- Verify deployed application functionality.
+
+## Day 6 – Security Testing (Planned)
+
+- Test authentication and authorization.
+- Test document access restrictions.
+- Test permission granting and revocation.
+- Test unauthorized access attempts.
+- Test file upload validation.
+- Review security threats and mitigations.
+- Verify audit logging behavior.
+
+## Day 7 – Final Review and Submission (Planned)
+
+- Review project functionality.
+- Verify documentation.
+- Update README.md.
+- Review PROMPTS.md and THREATS.md.
+- Perform final testing.
+- Prepare project demonstration and submission.
+
+---
 
 ## Documentation
 
