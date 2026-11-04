@@ -12,22 +12,39 @@
 
 ## Day 3 – Document Management (Completed)
 
-**Tasks:**
+### 1. Document Upload
 
 - Implemented secure document upload using Flask.
+- Added support for PDF, DOCX, TXT, PNG, JPG, and JPEG files.
 - Added file extension validation.
 - Added file size restrictions based on file type.
-- Generated unique filenames using UUID.
-- Stored uploaded documents securely.
-- Implemented document listing.
-- Organized documents using categories.
-- Implemented filename-based document search.
-- Implemented category-based filtering.
-- Implemented document preview.
-- Implemented document download.
-- Added support for PDF, DOCX, TXT, PNG, JPG, and JPEG files.
+- Implemented secure filename handling.
+- Generated unique stored filenames using UUID.
+- Configured secure document storage inside the application instance folder.
+- Added upload success and error messages.
+
+### 2. Document Listing and Organization
+
+- Implemented document listing functionality.
+- Displayed uploaded document details.
+- Added document category support.
+- Implemented filename-based search.
+- Added category-based filtering.
+- Displayed upload timestamps in Indian Standard Time.
+- Implemented document ordering by upload date.
+
+### 3. Document Preview and Download
+
+- Implemented document preview route.
+- Implemented document download route.
+- Added login and document access checks.
+- Restricted unauthorized document access.
+
+### 4. Document Categories
+
 - Implemented General, Personal, Work, Education, and Finance categories.
-- Added category selection during document upload.
+- Added category selection during upload.
+- Implemented category filtering.
 
 **Status: Completed**
 
@@ -52,8 +69,7 @@
 ### 2. Document Access Control
 
 - Implemented centralized document access checking.
-- Added document owner access.
-- Added administrator access checks.
+- Added document owner and administrator access checks.
 - Implemented shared document access for authorized users.
 - Restricted unauthorized preview and download requests.
 - Added Edit permission checks for document modifications.
@@ -86,7 +102,7 @@
 
 - Implemented admin activity route.
 - Added administrator role verification.
-- Created admin activity page.
+- Created the admin activity page at `templates/admin/activity.html`.
 - Implemented display of recent audit activities.
 - Restricted activity page access to administrators.
 - Added admin activity link to the dashboard.
@@ -95,8 +111,8 @@
 
 - Fixed category filtering issue.
 - Fixed document deletion foreign-key constraint issue.
-- Implemented safe audit logging for document deletion.
-- Verified Python syntax using py_compile.
+- Updated deletion audit logging to avoid foreign-key conflicts.
+- Verified Python syntax for app.py, routes/documents.py, and models/audit_log.py using py_compile.
 
 **Status: Completed**
 
@@ -145,4 +161,5 @@
 - Maintain documentation throughout development.
 - Commit and push changes regularly.
 - Test security controls before final submission.
+
 
