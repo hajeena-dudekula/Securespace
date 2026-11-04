@@ -1,142 +1,322 @@
-# AI Usage Log � SecureSpace
+# AI Usage Log – SecureSpace
 
-## Prompt 1: Project Analysis and Planning
+## Project Overview
 
-### Prompt Given to AI
+**Project:** SecureSpace – Secure Document Sharing with a Real Audit Trail
+**Challenge:** Snovasys Fresher Hiring Challenge 2026
+**Technology Stack:** Python, Flask, SQLite, HTML, CSS, JavaScript
 
-I am participating in the Snovasys Fresher Hiring Challenge 2026.
+This document records how AI assistance was used during project planning, implementation, debugging, and review.
 
-My project is SecureSpace, a secure document-sharing web application with a real audit trail.
+AI-generated suggestions were reviewed and adapted to the existing project. They were not treated as automatically correct. Implementation decisions and verification remain the developer's responsibility.
 
-I am a beginner in Python and web development. I know basic HTML and CSS. I plan to use Python Flask, SQLite, HTML, CSS, and JavaScript.
+---
 
-Please analyze the project requirements in detail and explain:
+## Day 1 – Project Analysis and Planning
 
-1. The main features I need to implement.
-2. The user roles and permissions.
-3. The security requirements and possible threats.
-4. The database tables I may need.
-5. The project architecture and folder structure.
-6. A step-by-step development plan suitable for a beginner.
-7. Which features are mandatory for the hackathon.
-8. How I can maximize the evaluation score.
+### Prompt 1: Project Analysis and Planning
 
-Explain everything in simple language.
+**Prompt objective:**
 
-### AI Response Summary
+Analyze the SecureSpace project requirements and help plan a secure document-sharing application suitable for a beginner developer.
 
-The AI analyzed the project requirements and suggested a secure document-sharing architecture with authentication, role-based access control, document management, permission management, audit logging, search, and security testing.
+The requested guidance covered:
 
-### My Review
+1. Main application features.
+2. User roles and permissions.
+3. Security requirements and possible threats.
+4. Database tables and relationships.
+5. Project architecture and folder structure.
+6. A step-by-step development plan.
+7. Mandatory and optional requirements.
+8. Evaluation and project quality considerations.
 
-I reviewed the AI suggestions and compared them with the official hackathon requirements.
+**AI assistance summary:**
 
-I decided to use Python Flask, SQLite, HTML, CSS, and JavaScript as the technology stack.
+AI assistance was used to understand the project scope and explore an application architecture involving authentication, document management, access permissions, and audit logging.
 
-I also decided to prioritize mandatory requirements and security features before implementing optional enhancements.
+**Developer review and decisions:**
 
-### Final Decision
+- Reviewed the suggestions against the project requirements.
+- Selected Flask and SQLite for the backend.
+- Prioritized authentication, document management, authorization, and audit logging.
+- Planned development in manageable stages.
 
-I will build SecureSpace step by step, following a 7-day development plan.
+---
 
-I will verify AI-generated suggestions against the official project requirements and correct any mistakes before implementing them.
+## Day 2 – Authentication and Initial Security
 
-## Day 2 - Authentication and Security
-
-### Entry 1 - User Registration
 Date: 2026-11-02
 
-Prompt:
-Help me implement user registration in SecureSpace using Flask and SQLite. Check the existing project structure and use the existing User model.
+### Entry 1 – User Registration
 
-AI Output:
-Generated registration logic with username, email, password hashing, and database insertion.
+**Prompt objective:**
 
-Issue:
-The initial implementation did not validate all inputs and did not check for duplicate email addresses.
+Implement user registration in Flask and SQLite using the existing User model and project structure.
 
-Correction:
-Added input validation and duplicate username/email checks.
+**AI assistance summary:**
 
-Commit:
-Pending
+Received guidance for collecting registration details, hashing passwords, and saving user records.
 
-### Entry 2 - User Login
-Date: 2026-11-02
+**Review and corrections:**
 
-Prompt:
-Help me implement login functionality using Flask-Login. Users should log in with their registered username and password.
+- Added input validation.
+- Added duplicate username and email checks.
+- Used password hashing instead of storing plain-text passwords.
+- Registration assigns the default viewer role; users cannot select an administrator role themselves.
 
-AI Output:
-Generated login logic using password hash verification.
+### Entry 2 – User Login
 
-Issue:
-The initial implementation did not include login attempt rate limiting.
+**Prompt objective:**
 
-Correction:
-Rate limiting is not implemented yet. This remains a security risk to address.
+Implement username and password login using Flask-Login.
 
-Commit:
-Pending
+**AI assistance summary:**
 
-### Entry 3 - Dashboard Access Control
-Date: 2026-11-02
+Received guidance for checking submitted credentials against stored password hashes and creating an authenticated session.
 
-Prompt:
-Help me protect the SecureSpace dashboard so only authenticated users can access it.
+**Review and remaining work:**
 
-AI Output:
-Generated a dashboard route using Flask-Login login_required.
+- Password hash verification is used.
+- Login attempt rate limiting has not been implemented.
+- Brute-force protection remains a security improvement.
 
-Issue:
-Authentication protects the dashboard, but it does not enforce document-level permissions or role-based authorization.
+### Entry 3 – Dashboard Access Control
 
-Correction:
-Document-level authorization is planned for the document sharing implementation.
+**Prompt objective:**
 
-Commit:
-Pending
+Protect the dashboard so that only authenticated users can access it.
 
-### Entry 4 - Authentication Security Review
-Date: 2026-11-02
+**AI assistance summary:**
 
-Prompt:
-Review the login and registration code for security issues. Check whether authentication is sufficient to protect user resources.
+Received guidance for using Flask-Login authentication decorators.
 
-AI Output:
-Identified password hashing and authentication checks.
+**Review and corrections:**
 
-Issue:
-The review did not implement authorization checks for individual documents.
+- Authentication is required for dashboard access.
+- Authentication alone is not treated as sufficient authorization for individual documents.
+- Document-level access checks were addressed during the document management and authorization stages.
 
-Correction:
-Document ownership and permission checks must be implemented before document access features are considered secure.
+### Entry 4 – Authentication Security Review
 
-Commit:
-Pending
+**Prompt objective:**
 
-### Entry 5 - Session and Logout
-Date: 2026-11-02
+Review the registration and login implementation and identify security gaps.
 
-Prompt:
-Help me implement logout using Flask-Login and check whether the logout route is protected.
+**AI assistance summary:**
 
-AI Output:
-Generated a logout route.
+Received guidance about password storage, authentication, and the difference between authentication and authorization.
 
-Issue:
-Logout was initially implemented using GET, which is not ideal for a state-changing operation.
+**Developer decision:**
 
-Correction:
-Changed logout to POST. CSRF protection still needs to be verified.
+Document ownership and permission checks were treated as separate requirements and implemented in the later authorization stage.
 
-Commit:
-Pending
+### Entry 5 – Session and Logout
 
-## Reusable Context
+**Prompt objective:**
 
-- PROBLEM_STATEMENT.md: Mandatory project requirements.
-- THREATS.md: Security threat analysis and mitigation tracking.
-- AI_TOOLS.md: AI usage instructions.
-- PROMPTS.md: Development prompts and AI output review.
+Implement logout using Flask-Login and review the logout request method.
 
+**AI assistance summary:**
+
+Received guidance for ending the authenticated session.
+
+**Review and corrections:**
+
+- Logout uses a POST route.
+- CSRF protection still needs to be configured and verified.
+
+---
+
+## Day 3 – Document Management
+
+Date: 2026-11-04
+
+### Entry 1 – Document Upload
+
+**Prompt objective:**
+
+Implement secure document uploading using the existing Flask application structure.
+
+**AI assistance summary:**
+
+Received guidance for handling uploaded files, validating extensions, storing files, and creating database records.
+
+**Developer review and implementation:**
+
+- Added support for PDF, DOCX, TXT, PNG, JPG, and JPEG.
+- Added file-size limits based on file type.
+- Used secure filename handling.
+- Used UUID-based stored filenames.
+- Stored uploaded files in the application instance document folder.
+- Added upload success and error messages.
+
+### Entry 2 – Document Listing and Search
+
+**Prompt objective:**
+
+Implement document listing with filename search, category filtering, and upload date display.
+
+**AI assistance summary:**
+
+Received guidance for querying document records and displaying them in the application.
+
+**Developer review and implementation:**
+
+- Added document listing.
+- Added filename search.
+- Added category filtering.
+- Added categories: General, Personal, Work, Education, and Finance.
+- Added upload-date ordering and IST display.
+
+### Entry 3 – Document Preview and Download
+
+**Prompt objective:**
+
+Implement document preview and download routes with authentication and access checks.
+
+**AI assistance summary:**
+
+Received guidance for serving stored documents through Flask routes.
+
+**Developer review and implementation:**
+
+- Added preview and download routes.
+- Added login and document access checks.
+- Added activity logging for preview and download actions.
+
+---
+
+## Day 4 – Authorization and Audit Trail
+
+Date: 2026-11-04
+
+### Entry 1 – Document Permission Model
+
+**Prompt objective:**
+
+Design and implement document-level sharing permissions using the existing SQLAlchemy models.
+
+**AI assistance summary:**
+
+Received guidance for associating users with documents and storing permission types.
+
+**Developer review and implementation:**
+
+- Added a DocumentPermission model.
+- Added read and edit permission types.
+- Added document and user relationships.
+- Added database constraints for permission values and duplicate document-user permissions.
+
+### Entry 2 – Share and Revoke Access
+
+**Prompt objective:**
+
+Implement document sharing with registered users and allow document owners to revoke access.
+
+**AI assistance summary:**
+
+Received guidance for validating target users, assigning permissions, and removing existing permissions.
+
+**Developer review and implementation:**
+
+- Added sharing using usernames.
+- Validated read and edit permission values.
+- Prevented users from sharing documents with themselves.
+- Allowed existing permissions to be updated.
+- Added permission revocation.
+- Added audit events for granting and revoking permissions.
+
+### Entry 3 – Document Authorization
+
+**Prompt objective:**
+
+Review document routes and enforce ownership and permission checks before allowing document operations.
+
+**AI assistance summary:**
+
+Received guidance for centralizing document access checks and distinguishing owners, administrators, and shared users.
+
+**Developer review and implementation:**
+
+- Added a document access helper.
+- Owners and administrators receive edit access.
+- Shared users receive the permission assigned to them.
+- Preview and download routes check document access.
+- Document modifications require appropriate edit access.
+- Document deletion is restricted to the owner or administrator.
+
+### Entry 4 – Document Management Operations
+
+**Prompt objective:**
+
+Implement document category editing and deletion while preserving authorization checks and activity records.
+
+**AI assistance summary:**
+
+Received implementation and debugging guidance for document modification and deletion routes.
+
+**Developer review and implementation:**
+
+- Added category editing.
+- Added document deletion.
+- Added owner and administrator checks.
+- Recorded document modification and deletion events.
+
+### Entry 5 – Audit Trail
+
+**Prompt objective:**
+
+Design an audit log that records important document activities and provides an administrator activity view.
+
+**AI assistance summary:**
+
+Received guidance for recording the actor, document reference, action, details, IP address, and timestamp.
+
+**Developer review and implementation:**
+
+- Added an AuditLog model.
+- Added logging for upload, preview, download, permission grant, permission revocation, modification, and deletion.
+- Added an administrator activity route.
+- Restricted the activity page to administrator accounts.
+- Added a dashboard link to the activity page.
+
+### Entry 6 – Debugging and Verification
+
+**Prompt objective:**
+
+Help investigate errors in document routes, database relationships, category filtering, and deletion logic.
+
+**AI assistance summary:**
+
+Received debugging guidance based on the reported errors and existing source code.
+
+**Developer review and verification:**
+
+- Corrected the document category filtering logic.
+- Addressed a foreign-key issue when recording document deletion.
+- Ran Python compilation checks on the relevant application and route files.
+- Compilation completed without syntax errors.
+
+**Verification limitation:**
+
+Compilation confirms syntax validity only. Complete end-to-end authorization and security testing is still pending.
+
+---
+
+## Responsible Use of AI
+
+- AI was used as a development and debugging assistant.
+- Existing project structure and code were considered before making changes.
+- Generated suggestions were reviewed before implementation.
+- Reported errors were investigated and corrected.
+- Features that have not been implemented or tested are not described as completed.
+- Final implementation and testing decisions remain the developer's responsibility.
+
+## Related Project Documentation
+
+- `PROBLEM_STATEMENT.md` – Project requirements.
+- `THREATS.md` – Security threat analysis and mitigation status.
+- `AI_TOOLS.md` – AI tools and usage information.
+- `PROJECT_PLAN.md` – Development progress and planned work.
+- `PROMPTS.md` – AI assistance and development review log.
