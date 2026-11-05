@@ -114,10 +114,22 @@
 - Updated deletion audit logging to avoid foreign-key conflicts.
 - Verified Python syntax for app.py, routes/documents.py, and models/audit_log.py using py_compile.
 
+### 7. Security Test Verification - November 5, 2026
+
+- Added pytest authentication and authorization coverage.
+- Verified owner, viewer, and administrator access boundaries.
+- Tested document sharing and permission revocation.
+- Verified unauthorized preview and download requests return HTTP 403.
+- Verified denied preview and download attempts generate audit records.
+- Verified viewers cannot access the administrator activity page.
+- Verified administrators can access the activity page.
+- Full test suite result: **18 passed, 0 failed**.
+- Identified 9 SQLAlchemy Query.get() deprecation warnings for future cleanup.
+
 **Status: Completed**
 
 ---
-## Day 5 – Deployment (Planned)
+## Day 5 - Deployment (Planned)
 
 - Prepare the application for deployment.
 - Configure production environment variables.
@@ -161,5 +173,6 @@
 - Maintain documentation throughout development.
 - Commit and push changes regularly.
 - Test security controls before final submission.
+
 
 

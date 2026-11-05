@@ -1,4 +1,4 @@
-﻿from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for
 from flask_login import LoginManager, login_required, current_user
 
 from extensions import db
@@ -11,12 +11,15 @@ from routes.auth import auth
 from routes.documents import documents
 
 
-def create_app():
+def create_app(test_config=None):
 
     app = Flask(__name__)
 
     app.config.from_object(Config)
     app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024
+
+    if test_config:
+        app.config.update(test_config)
 
     db.init_app(app)
 
@@ -76,5 +79,7 @@ if __name__ == "__main__":
 
 from models.permission import DocumentPermission
 from models.audit_log import AuditLog
+
+
 
 

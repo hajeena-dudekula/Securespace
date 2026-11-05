@@ -1,143 +1,149 @@
-# SecureSpace – Security Threat Analysis
+﻿# SecureSpace – Security Threat Analysis
 
 ## 1. Project Information
 
-**Project:** SecureSpace – Secure Document Sharing with a Real Audit Trail
-**Application:** Flask-based document-sharing web application
-**Database:** SQLite
-**Date of review:** 2026-11-04
+- **Project:** SecureSpace – Secure Document Sharing with a Real Audit Trail
+- **Application:** Flask-based document-sharing application
+- **Database:** SQLite
+- **Review date:** 2026-11-05
 
 ## 2. Purpose
 
-This document identifies security threats affecting SecureSpace, records the protections currently implemented, and tracks security controls that still require implementation or testing.
+This document identifies security threats, records currently implemented controls, and lists security improvements that still require implementation or testing.
 
-A feature is not considered fully secure merely because its route or model exists. Security testing is required to verify the actual behavior.
+A feature is not considered fully secure only because its code exists. Its behavior must also be tested.
 
 ## 3. Threat Register
 
 ### Threat 1 – Unauthorized Document Access
 
-**Risk:** A user may try to access another user's private document by changing a document ID or URL.
+**Risk:** A user may try to access another user's document without permission.
 
 **Current controls:**
 - Login is required for protected document operations.
 - Document ownership and sharing permissions are checked.
-- Preview and download routes check document access.
-- Shared users receive only their assigned permission.
+- Preview and download routes check access.
 
-**Status:** Access-control checks implemented. IDOR and unauthorized-access testing pending.
+**Verified:** Unauthorized preview and download attempts were tested and returned HTTP 403. Denied attempts generated audit records.
+
+**Remaining work:** Test modified document IDs (IDOR) and additional unauthorized access scenarios.
+
+**Status:** Basic access-control tests passed; IDOR testing pending.
 
 ### Threat 2 – Broken Access Control
 
-**Risk:** A viewer or shared user may attempt to edit, share, revoke, or delete documents without sufficient permission.
+**Risk:** A user may attempt actions beyond their assigned permissions.
 
 **Current controls:**
-- A centralized document access helper is used.
 - Read and edit permissions are supported.
-- Document modification requires edit access.
+- Document modifications require edit access.
 - Sharing and revocation are restricted to document owners.
 - Deletion is restricted to owners and administrators.
 - Administrator activity access checks the administrator role.
 
-**Status:** Authorization logic implemented. Full role and permission testing pending.
+**Verified:** Owner, viewer, and administrator access boundaries were tested. Viewers were blocked from editing, deleting, and accessing administrator activity.
+
+**Remaining work:** Test additional editor restrictions and role-escalation scenarios.
+
+**Status:** Core authorization tests passed; additional testing pending.
 
 ### Threat 3 – Malicious or Invalid File Uploads
 
-**Risk:** An attacker may upload an unsupported, oversized, or malicious file.
+**Risk:** An attacker may upload unsupported, oversized, or malicious files.
 
 **Current controls:**
-- File extensions are restricted to PDF, DOCX, TXT, PNG, JPG, and JPEG.
+- Allowed extensions are restricted to PDF, DOCX, TXT, PNG, JPG, and JPEG.
 - File-size limits are configured by file type.
 - Secure filename handling is used.
-- UUID-based stored filenames reduce filename collision and path manipulation risks.
-- Uploaded files are stored in the application instance folder.
+- UUID-based stored filenames are used.
+- Files are stored in the application instance folder.
 
-**Remaining gaps:**
-- File content and actual file signatures are not validated.
-- Malware scanning is not implemented.
-- Archive and document parser safety have not been tested.
+**Remaining work:**
+- Validate actual file content and signatures.
+- Add malware scanning.
+- Test malformed and potentially harmful files.
 
-**Status:** Basic upload restrictions implemented. Strong file validation and malware scanning pending.
+**Status:** Basic upload restrictions implemented; stronger validation pending.
 
 ### Threat 4 – Audit Log Tampering
 
-**Risk:** A user may try to alter or remove audit records to hide activities.
+**Risk:** An attacker may try to modify or delete audit records.
 
 **Current controls:**
-- An AuditLog database model records actor, document reference, action, details, IP address, and timestamp.
+- AuditLog records actor, document reference, action, details, IP address, and timestamp.
 - Important document operations create audit entries.
-- The administrator activity route checks the administrator role.
+- Administrator activity access is restricted.
 
-**Remaining gaps:**
-- Logs are stored in the same application database.
-- Independent or append-only audit storage is not implemented.
-- Audit-log tampering resistance has not been tested.
+**Remaining work:**
+- Add independent or append-only audit storage.
+- Test audit-log integrity and tampering resistance.
 
-**Status:** Audit logging implemented. Tamper resistance and integrity verification pending.
+**Status:** Audit logging implemented; tamper resistance pending.
 
 ### Threat 5 – Permission Revocation Failure
 
-**Risk:** A previously authorized user may retain access after the document owner revokes permission.
+**Risk:** A user may retain document access after permission is revoked.
 
 **Current controls:**
-- A revocation route removes the user's document permission.
-- Document access checks use the current permission records.
+- A revocation route removes the user's permission.
+- Document access checks use current permission records.
 
-**Status:** Revocation logic implemented. Post-revocation access testing pending.
+**Verified:** Revoked viewer access was tested; subsequent download attempts returned HTTP 403.
+
+**Remaining work:** Add a dedicated revoke-then-preview test and additional revocation edge cases.
+
+**Status:** Revocation download behavior tested; additional testing pending.
 
 ### Threat 6 – Session Hijacking and Session Misuse
 
 **Risk:** An attacker may misuse an exposed or stolen authenticated session.
 
 **Current controls:**
-- Flask-Login manages authenticated user sessions.
-- Logout is implemented using POST.
+- Flask-Login manages authenticated sessions.
+- Logout uses POST.
 
-**Remaining gaps:**
-- Secure cookie settings require production verification.
-- HTTPS deployment is not yet verified.
-- CSRF protection is not yet configured and verified.
+**Remaining work:**
+- Configure and verify CSRF protection.
+- Verify secure cookie settings.
+- Verify HTTPS during deployment.
 
-**Status:** Basic session management implemented. Additional session security and CSRF protection pending.
+**Status:** Basic session management implemented; additional security pending.
 
 ### Threat 7 – SQL Injection
 
-**Risk:** An attacker may submit malicious input to manipulate database queries.
+**Risk:** Malicious input may attempt to manipulate database queries.
 
 **Current controls:**
 - SQLAlchemy ORM is used for database operations.
 
-**Remaining gaps:**
-- All database access paths require security review.
-- Injection testing has not been completed.
+**Remaining work:** Review database access paths and perform injection testing.
 
-**Status:** ORM-based database access implemented. Security testing pending.
+**Status:** ORM-based database access implemented; security testing pending.
 
 ### Threat 8 – Brute-Force Login Attempts
 
-**Risk:** An attacker may repeatedly guess passwords through the login form.
+**Risk:** An attacker may repeatedly guess account passwords.
 
 **Current controls:**
 - Password hashes are verified during login.
 
-**Remaining gaps:**
-- Login rate limiting is not implemented.
-- Account lockout or additional login abuse protections are not implemented.
+**Remaining work:**
+- Implement login rate limiting.
+- Consider additional login abuse protections.
 
-**Status:** Not implemented. Requires attention before production deployment.
+**Status:** Rate limiting not implemented.
 
 ### Threat 9 – Weak Password Storage
 
-**Risk:** Plain-text password storage could expose user passwords if the database is accessed.
+**Risk:** Plain-text password storage could expose user passwords.
 
 **Current controls:**
 - Werkzeug password hashing is used.
-- Password verification uses the stored hash.
+- Password verification uses stored hashes.
 
-**Verification required:**
-- Confirm that stored database values are password hashes and not plain-text passwords.
+**Remaining work:** Verify stored password values in the database.
 
-**Status:** Password hashing implemented. Database verification pending.
+**Status:** Password hashing implemented; database verification pending.
 
 ### Threat 10 – Insecure Production Configuration
 
@@ -146,31 +152,31 @@ A feature is not considered fully secure merely because its route or model exist
 **Current controls:**
 - The application uses a configurable SECRET_KEY setting.
 
-**Remaining gaps:**
-- The current configuration contains a development fallback secret.
-- Production secret management is not configured.
-- Production HTTPS and deployment security settings are not verified.
+**Remaining work:**
+- Replace the development fallback secret.
+- Configure production secret management.
+- Verify HTTPS and production settings.
 
-**Status:** Development configuration exists. Production hardening pending.
+**Status:** Production hardening pending.
 
 ## 4. Security Testing Plan
 
-The following tests must be performed before claiming the corresponding protections are verified:
+The following tests are required:
 
-1. Try opening protected pages without logging in.
-2. Try accessing another user's document using a modified document ID.
-3. Verify that viewers cannot edit, share, revoke, or delete documents.
-4. Verify that editors cannot perform owner-only operations.
-5. Verify that administrators can access only the intended administrative functions.
-6. Revoke a shared user's permission and verify that access is denied afterward.
-7. Attempt unsupported file extensions and files exceeding configured size limits.
-8. Verify that audit entries are created for supported document operations.
-9. Check that unauthorized users cannot open the administrator activity page.
+1. Open protected pages without logging in.
+2. Attempt to access another user's document using a modified document ID.
+3. Verify viewers cannot edit, share, revoke, or delete documents.
+4. Verify editors cannot perform owner-only operations.
+5. Verify administrator access restrictions.
+6. Revoke a shared user's permission and test access again.
+7. Test unsupported file extensions and oversized files.
+8. Verify audit entries for supported document operations.
+9. Attempt to access the administrator activity page without administrator privileges.
 10. Review session cookies, CSRF protection, and login abuse controls.
 
 ## 5. Current Security Status
 
-| Security area | Current status |
+| Security area | Status |
 |---|---|
 | Password hashing | Implemented |
 | Login protection | Implemented |
@@ -187,30 +193,42 @@ The following tests must be performed before claiming the corresponding protecti
 | File signature validation | Pending |
 | Malware scanning | Pending |
 | Production secret configuration | Pending |
-| End-to-end security testing | Pending |
+| End-to-end security testing | In progress - 18 tests passed; additional scenarios pending |
 | Audit log tamper resistance | Pending |
 
 ## 6. Important Limitations
 
-- Syntax checks do not prove that application security controls work correctly.
-- Access-control behavior must be tested using multiple user accounts.
-- Database-backed audit logs are not equivalent to tamper-proof external audit storage.
-- Extension validation alone cannot guarantee that an uploaded file is safe.
-- The application should not be considered production-ready until the remaining security gaps are addressed.
+- Syntax checks do not prove application security.
+- Access-control behavior must be tested with multiple accounts.
+- Database-backed audit logs are not equivalent to tamper-proof external storage.
+- Extension validation alone cannot guarantee file safety.
+- The application should not be considered production-ready until remaining security gaps are addressed.
 
 ## 7. Review History
 
-### Day 1 – Initial Threat Identification
+**Day 1 – Initial Threat Identification**
+
 Identified unauthorized access, broken access control, malicious uploads, audit tampering, permission revocation failure, session misuse, and SQL injection.
 
-### Day 2 – Authentication Security
+**Day 2 – Authentication Security**
+
 Implemented password hashing, login, dashboard authentication, and POST-based logout. Identified rate limiting and CSRF protection as remaining work.
 
-### Day 3 – Document Management
+**Day 3 – Document Management**
+
 Implemented basic file-type and file-size restrictions, document storage, listing, preview, and download access checks.
 
-### Day 4 – Authorization and Audit Trail
+**Day 4 – Authorization and Audit Trail**
+
 Implemented document-level permissions, sharing, revocation, owner/admin checks, and audit event recording.
 
-### Next Review
+**Day 4 - Security Testing Verification (November 5, 2026)**
+
+Added pytest authentication and authorization coverage. The full test suite passed with 18 tests and 0 failures. Verified owner, viewer, and administrator access boundaries, sharing, revocation, denied preview/download responses, denied-access audit records, and administrator activity restrictions. Nine SQLAlchemy deprecation warnings remain for future cleanup.
+
+**Remaining security work:** IDOR testing, upload validation tests, CSRF, rate limiting, production hardening, and audit tamper resistance.
+
+**Next Review**
+
 Perform end-to-end security testing, address remaining gaps, and update this document based on actual test results.
+

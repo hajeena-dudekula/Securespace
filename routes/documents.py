@@ -1,4 +1,4 @@
-﻿import os
+import os
 import uuid
 
 from datetime import datetime, timezone, timedelta
@@ -107,12 +107,28 @@ def document_list():
                 timezone(timedelta(hours=5, minutes=30))
             )
 
+    access_levels = {}
+
+    for item in files:
+        if current_user.role == "admin" or item.user_id == current_user.id:
+            access_levels[item.id] = "edit"
+        else:
+            permission = DocumentPermission.query.filter_by(
+                document_id=item.id,
+                user_id=current_user.id
+            ).first()
+
+            access_levels[item.id] = (
+                permission.permission if permission else None
+            )
+
     return render_template(
         "documents/list.html",
         files=files,
         search=search,
         category=category,
-        display_dates=display_dates
+        display_dates=display_dates,
+        access_levels=access_levels
     )
 
 
@@ -206,6 +222,16 @@ def preview_document(document_id):
     document, access = get_document_access(document_id)
 
     if not document or access not in {"read", "edit"}:
+
+        db.session.add(AuditLog(
+            actor_id=current_user.id,
+            document_id=document.id if document else None,
+            action="access_denied_preview",
+            details=f"Unauthorized preview attempt for document ID {document_id}",
+            ip_address=request.remote_addr
+        ))
+        db.session.commit()
+
         return "Access denied", 403
 
     extension = document.filename.rsplit(".", 1)[-1].lower()
@@ -242,6 +268,16 @@ def download_document(document_id):
     document, access = get_document_access(document_id)
 
     if not document or access not in {"read", "edit"}:
+
+        db.session.add(AuditLog(
+            actor_id=current_user.id,
+            document_id=document.id if document else None,
+            action="access_denied_download",
+            details=f"Unauthorized download attempt for document ID {document_id}",
+            ip_address=request.remote_addr
+        ))
+        db.session.commit()
+
         return "Access denied", 403
 
     upload_folder = os.path.join(
@@ -443,6 +479,7 @@ def delete_document(document_id):
         flash("Document deletion failed.", "error")
 
     return redirect(url_for("documents.document_list"))
+
 
 
 

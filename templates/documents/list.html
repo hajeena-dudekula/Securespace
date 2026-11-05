@@ -1,0 +1,660 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SecureSpace | My Documents</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f4f5fb;
+    color: #25213d;
+    min-height: 100vh;
+}
+
+.navbar {
+    background: white;
+    padding: 19px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 3px 15px #0000000a;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: 800;
+    color: #5426c7;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #5426c7;
+    font-weight: 600;
+}
+
+.container {
+    max-width: 1150px;
+    margin: 40px auto;
+    padding: 0 22px 40px;
+}
+
+.hero {
+    background: linear-gradient(120deg, #5426c7, #8261e8);
+    color: white;
+    padding: 35px;
+    border-radius: 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.hero h1 {
+    font-size: 30px;
+    margin-bottom: 9px;
+}
+
+.hero p {
+    opacity: .9;
+    line-height: 1.5;
+}
+
+.upload-link {
+    background: white;
+    color: #5426c7;
+    padding: 13px 21px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.messages {
+    margin-top: 20px;
+}
+
+.message {
+    padding: 13px 17px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    background: #fff0f0;
+    color: #b83232;
+}
+
+.message.success {
+    background: #e9f9ef;
+    color: #247a43;
+}
+
+.toolbar {
+    background: white;
+    padding: 22px;
+    border-radius: 17px;
+    margin-top: 25px;
+    box-shadow: 0 5px 20px #00000008;
+}
+
+.toolbar h2 {
+    font-size: 19px;
+    margin-bottom: 15px;
+}
+
+.search-form {
+    display: flex;
+    gap: 12px;
+}
+
+.search-form input,
+.search-form select {
+    min-width: 0;
+    flex: 1;
+    padding: 13px 14px;
+    border: 1px solid #e2deed;
+    border-radius: 10px;
+    font-size: 14px;
+    background: white;
+    outline: none;
+}
+
+.search-form input:focus,
+.search-form select:focus {
+    border-color: #7954d6;
+}
+
+.search-button {
+    border: none;
+    border-radius: 10px;
+    background: #5426c7;
+    color: white;
+    padding: 0 23px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 30px 2px 17px;
+}
+
+.section-heading h2 {
+    font-size: 21px;
+}
+
+.document-count {
+    color: #777;
+    font-size: 14px;
+}
+
+.document-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 19px;
+}
+
+.document-card {
+    background: white;
+    border: 1px solid #eeebf5;
+    border-radius: 17px;
+    padding: 22px;
+    box-shadow: 0 5px 18px #00000006;
+    transition: .2s;
+}
+
+.document-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px #5426c714;
+}
+
+.document-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.document-icon {
+    width: 53px;
+    height: 53px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    background: #f0eaff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.document-icon svg {
+    width: 27px;
+    height: 27px;
+}
+
+.document-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.document-info h3 {
+    font-size: 16px;
+    overflow-wrap: anywhere;
+    line-height: 1.5;
+    margin: 2px 0 7px;
+}
+
+.category {
+    display: inline-block;
+    background: #f0eaff;
+    color: #5426c7;
+    padding: 5px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.document-meta {
+    border-top: 1px solid #f0edf5;
+    margin-top: 19px;
+    padding-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.meta-item {
+    color: #777;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.meta-item strong {
+    display: block;
+    color: #39334f;
+    font-weight: 600;
+}
+
+.preview-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 18px;
+    padding: 12px;
+    background: #f0eaff;
+    color: #5426c7;
+    border: 1px solid #d9cdf8;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+    transition: .2s;
+}
+
+.preview-link:hover {
+    background: #e4d9ff;
+}
+.download-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 18px;
+    padding: 12px;
+    background: #5426c7;
+    color: white;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+    transition: .2s;
+}
+
+.download-link:hover {
+    background: #4320a2;
+}
+
+.download-link svg {
+    width: 17px;
+    height: 17px;
+}
+
+.document-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.management-form {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding: 14px;
+    border: 1px solid #eeebf5;
+    border-radius: 12px;
+    background: #faf9ff;
+}
+
+.management-form h4 {
+    margin: 0;
+    color: #34215f;
+    font-size: 14px;
+}
+
+.management-form input,
+.management-form select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ded7ed;
+    border-radius: 8px;
+    background: white;
+    font-size: 13px;
+}
+
+.management-form button {
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #5426c7;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.management-form button:hover {
+    background: #4320a2;
+}
+
+.management-form .delete-button {
+    background: #c62828;
+}
+
+.management-form .delete-button:hover {
+    background: #a51f1f;
+}
+
+@media (max-width: 600px) {
+    .document-actions {
+        grid-template-columns: 1fr;
+    }
+}
+.empty-state {
+    background: white;
+    border-radius: 17px;
+    padding: 55px 20px;
+    text-align: center;
+    grid-column: 1 / -1;
+}
+
+.empty-icon {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 17px;
+    background: #f0eaff;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-icon svg {
+    width: 32px;
+    height: 32px;
+}
+
+.empty-state h3 {
+    margin-bottom: 9px;
+}
+
+.empty-state p {
+    color: #888;
+    margin-bottom: 20px;
+}
+
+.footer {
+    text-align: center;
+    color: #999;
+    font-size: 13px;
+    padding: 25px 10px;
+}
+
+@media(max-width: 700px) {
+    .navbar {
+        padding: 17px 20px;
+    }
+
+    .container {
+        margin-top: 25px;
+    }
+
+    .hero {
+        padding: 25px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .hero h1 {
+        font-size: 25px;
+    }
+
+    .search-form {
+        flex-direction: column;
+    }
+
+    .search-form input,
+    .search-form select,
+    .search-button {
+        width: 100%;
+        min-height: 45px;
+    }
+
+    .document-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <div class="logo">SecureSpace</div>
+    <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+</nav>
+
+<main class="container">
+
+    <section class="hero">
+        <div>
+            <h1>My Documents</h1>
+            <p>Your secure document workspace. Manage and access your files in one place.</p>
+        </div>
+
+        <a class="upload-link" href="{{ url_for('documents.upload_document') }}">
+            Upload Document
+        </a>
+    </section>
+
+    <div class="messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+    </div>
+
+    <section class="toolbar">
+        <h2>Find Your Documents</h2>
+
+        <form class="search-form" method="GET">
+            <input
+                type="text"
+                name="search"
+                placeholder="Search by document name..."
+                value="{{ search }}"
+            >
+
+            <select name="category">
+                <option value="">All Categories</option>
+                {% for item in ["General", "Personal", "Work", "Education", "Finance"] %}
+                    <option value="{{ item }}"
+                        {% if category == item %}selected{% endif %}>
+                        {{ item }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button class="search-button" type="submit">Search</button>
+        </form>
+    </section>
+
+    <div class="section-heading">
+        <h2>Your Files</h2>
+        <span class="document-count">{{ files|length }} document(s)</span>
+    </div>
+
+    <section class="document-grid">
+
+        {% if files %}
+
+            {% for file in files %}
+
+                <article class="document-card">
+
+                    <div class="document-top">
+
+                        <div class="document-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#5426c7" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <path d="M14 2v6h6"/>
+                                <path d="M8 13h8M8 17h8"/>
+                            </svg>
+                        </div>
+
+                        <div class="document-info">
+                            <h3>{{ file.filename }}</h3>
+                            <span class="category">{{ file.category }}</span>
+                        </div>
+
+                    </div>
+
+                    <div class="document-meta">
+
+                        <div class="meta-item">
+                            Uploaded date
+                            <strong>
+                                {{ display_dates[file.id].strftime("%d %b %Y") }}
+                            </strong>
+                        </div>
+
+                        <div class="meta-item">
+                            Upload time
+                            <strong>
+                                {{ display_dates[file.id].strftime("%I:%M:%S %p") }}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <a class="preview-link"
+                       href="{{ url_for('documents.preview_document', document_id=file.id) }}"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        Preview Document
+                    </a>
+                    <a class="download-link"
+                       href="{{ url_for('documents.download_document', document_id=file.id) }}">
+
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <path d="m7 10 5 5 5-5"/>
+                            <path d="M12 15V3"/>
+                        </svg>
+
+                        Download Document
+                    </a>
+
+                    <div class="document-actions">
+
+                        {% if file.user_id == current_user.id %}
+
+                            <form method="POST"
+                                  action="{{ url_for('documents.share_document', document_id=file.id) }}"
+                                  class="management-form">
+
+                                <h4>Share Document</h4>
+
+                                <input type="text"
+                                       name="username"
+                                       placeholder="Enter username"
+                                       required>
+
+                                <select name="permission" required>
+                                    <option value="read">Viewer</option>
+                                    <option value="edit">Editor</option>
+                                </select>
+
+                                <button type="submit">Share</button>
+                            </form>
+
+                            <form method="POST"
+                                  action="{{ url_for('documents.revoke_document_access', document_id=file.id) }}"
+                                  class="management-form">
+
+                                <h4>Revoke Access</h4>
+
+                                <input type="text"
+                                       name="username"
+                                       placeholder="Enter username"
+                                       required>
+
+                                <button type="submit">Revoke</button>
+                            </form>
+
+                        {% endif %}
+
+                        {% if access_levels[file.id] == "edit" %}
+
+                            <form method="POST"
+                                  action="{{ url_for('documents.edit_document', document_id=file.id) }}"
+                                  class="management-form">
+
+                                <h4>Edit Category</h4>
+
+                                <select name="category" required>
+                                    {% for cat in ["General", "Personal", "Work", "Education", "Finance"] %}
+                                        <option value="{{ cat }}"
+                                            {% if file.category == cat %}selected{% endif %}>
+                                            {{ cat }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+
+                                <button type="submit">Update Category</button>
+                            </form>
+
+                        {% endif %}
+
+                        {% if file.user_id == current_user.id or current_user.role == "admin" %}
+
+                            <form method="POST"
+                                  action="{{ url_for('documents.delete_document', document_id=file.id) }}"
+                                  class="management-form"
+                                  onsubmit="return confirm('Are you sure you want to delete this document?');">
+
+                                <button type="submit" class="delete-button">
+                                    Delete Document
+                                </button>
+                            </form>
+
+                        {% endif %}
+
+                    </div>
+
+                </article>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#5426c7" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <path d="M14 2v6h6"/>
+                        <path d="M12 11v6M9 14h6"/>
+                    </svg>
+                </div>
+
+                <h3>No documents found</h3>
+                <p>Upload your first document or try a different search.</p>
+
+                <a class="upload-link" href="{{ url_for('documents.upload_document') }}">
+                    Upload Your First Document
+                </a>
+            </div>
+
+        {% endif %}
+
+    </section>
+
+    <footer class="footer">
+        SecureSpace - Your documents, securely managed.
+    </footer>
+
+</main>
+
+</body>
+</html>
+
+
+
