@@ -232,3 +232,16 @@ Added pytest authentication and authorization coverage. The full test suite pass
 
 Perform end-to-end security testing, address remaining gaps, and update this document based on actual test results.
 
+
+**Day 5 – Deployment Preparation Review (November 5, 2026)**
+
+- Added environment-variable support for application secrets, database configuration, secure session cookies, and document storage.
+- Added configurable document storage path handling for upload, preview, download, and deletion.
+- Full automated test suite passed: 18 tests, 0 failures.
+- Production secret enforcement is not complete because the development fallback remains.
+- Production database, persistent disk, HTTPS deployment, and live verification have not been completed.
+- Existing database-backed audit logs are not tamper-proof.
+- No claim of production readiness is made.
+
+**Carry-forward risks:** CSRF protection, login rate limiting, file signature validation, malware scanning, IDOR testing, production hardening, and audit-log tamper resistance remain to be addressed.
+

@@ -176,3 +176,24 @@
 
 
 
+
+## Day 5 – Deployment Preparation (November 5, 2026)
+
+**Completed:**
+- Added environment-variable configuration support for SECRET_KEY, DATABASE_URL, SESSION_COOKIE_SECURE, and DOCUMENT_STORAGE_PATH.
+- Added a centralized configurable document storage path.
+- Updated document upload, preview, download, and deletion routes to use the storage helper.
+- Verified Python syntax.
+- Ran the full test suite: 18 passed, 0 failed.
+- Committed and pushed application changes to GitHub.
+
+**Not completed:**
+- Actual deployment and live application verification.
+- Production SECRET_KEY enforcement.
+- Production database setup and migration.
+- Persistent storage configuration.
+- Deployment entry-point verification.
+
+**Carry forward to Day 6:**
+Complete remaining security testing and production-readiness work, including CSRF, rate limiting, file signature validation, IDOR tests, and deployment preparation.
+

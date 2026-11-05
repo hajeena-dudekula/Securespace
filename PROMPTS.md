@@ -320,3 +320,27 @@ Compilation confirms syntax validity only. Complete end-to-end authorization and
 - `AI_TOOLS.md` – AI tools and usage information.
 - `PROJECT_PLAN.md` – Development progress and planned work.
 - `PROMPTS.md` – AI assistance and development review log.
+
+### Entry 7 – Deployment Configuration Preparation (November 5, 2026)
+
+**Prompt objective:**
+
+Prepare the Flask application for deployment by supporting environment-based configuration and configurable document storage.
+
+**AI assistance summary:**
+
+Received guidance to update application configuration and centralize document storage path handling without disturbing existing document operations.
+
+**Developer review and implementation:**
+
+- Added environment-variable support for SECRET_KEY, DATABASE_URL, SESSION_COOKIE_SECURE, and DOCUMENT_STORAGE_PATH.
+- Added a centralized document storage path helper.
+- Updated upload, preview, download, and delete operations to use the helper.
+- Ran syntax verification.
+- Ran the full test suite: 18 passed, 0 failed.
+- Committed and pushed the application changes to GitHub.
+
+**Verification limitations:**
+
+Actual deployment, production database setup, persistent storage configuration, production secret enforcement, and live verification remain incomplete. The development SECRET_KEY fallback has not yet been removed.
+
