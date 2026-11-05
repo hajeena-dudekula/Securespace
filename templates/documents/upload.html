@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SecureSpace | Upload Document</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    font-family:"Segoe UI",Arial,sans-serif;
+    background:#f4f5fb;
+    color:#1c1b3a;
+    min-height:100vh;
+}
+.navbar {
+    background:white;
+    padding:20px 50px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 3px 15px #0000000a;
+}
+.logo { font-size:25px; font-weight:800; color:#5426c7; }
+.back { color:#5426c7; text-decoration:none; font-weight:600; }
+.container { max-width:750px; margin:45px auto; padding:20px; }
+.heading { text-align:center; margin-bottom:28px; }
+.heading h1 { font-size:30px; margin-bottom:10px; }
+.heading p { color:#777; }
+.upload-card {
+    background:white;
+    padding:35px;
+    border-radius:22px;
+    box-shadow:0 8px 30px #00000009;
+}
+.drop-zone {
+    min-height:280px;
+    border:2px dashed #b9a5ef;
+    border-radius:18px;
+    background:#faf8ff;
+    padding:35px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    cursor:pointer;
+    transition:.2s;
+}
+.drop-zone:hover,.drop-zone.dragging {
+    border-color:#5426c7;
+    background:#f1ebff;
+}
+.upload-prompt { width:100%; }
+.upload-icon {
+    width:65px;
+    height:65px;
+    margin:0 auto 18px;
+    border-radius:18px;
+    background:#eee8ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.upload-icon svg { width:32px; height:32px; }
+.upload-prompt h3 { margin-bottom:10px; }
+.upload-prompt p { color:#888; font-size:14px; margin-bottom:18px; }
+.browse {
+    display:inline-block;
+    background:#5426c7;
+    color:white;
+    padding:11px 23px;
+    border-radius:25px;
+    font-size:14px;
+    font-weight:600;
+}
+#fileInput { display:none; }
+.file-details {
+    display:none;
+    width:100%;
+    min-height:190px;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+    flex-direction:column;
+    background:#f5f1ff;
+    border:1px solid #e3d9ff;
+    border-radius:14px;
+    padding:25px;
+    text-align:center;
+}
+.file-icon {
+    width:65px;
+    height:65px;
+    border-radius:16px;
+    background:#e6dcff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.file-icon svg { width:34px; height:34px; }
+.file-info { width:100%; }
+.file-info strong {
+    display:block;
+    overflow-wrap:anywhere;
+    color:#292044;
+    font-size:17px;
+}
+.file-info span {
+    display:block;
+    color:#888;
+    font-size:13px;
+    margin-top:7px;
+}
+.remove-file {
+    border:none;
+    background:#ffe8e8;
+    color:#c03939;
+    padding:9px 18px;
+    border-radius:9px;
+    cursor:pointer;
+}
+.field { margin-top:25px; }
+.field label { display:block; font-weight:600; margin-bottom:10px; }
+.field select {
+    width:100%;
+    padding:14px;
+    border:1px solid #ddd;
+    border-radius:11px;
+    background:white;
+    font-size:15px;
+}
+.upload-button {
+    width:100%;
+    border:none;
+    background:linear-gradient(120deg,#5426c7,#8261e8);
+    color:white;
+    padding:16px;
+    border-radius:12px;
+    font-size:16px;
+    font-weight:700;
+    margin-top:28px;
+    cursor:pointer;
+}
+.upload-button:disabled { opacity:.6; cursor:not-allowed; }
+.message { padding:13px; border-radius:10px; margin-bottom:15px; }
+.message.error { background:#fff0f0; color:#b83232; }
+.message.success { background:#e9f9ef; color:#247a43; }
+.footer-note { text-align:center; color:#888; font-size:13px; margin-top:22px; }
+@media(max-width:600px) {
+    .navbar { padding:18px 20px; }
+    .container { margin:25px auto; }
+    .upload-card { padding:20px; }
+}
+
+/* Custom SecureSpace Notification */
+.custom-notice {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    z-index: 99999;
+    min-width: 300px;
+    max-width: 380px;
+    padding: 18px 22px;
+    background: #ffffff;
+    border-left: 5px solid #6d35d5;
+    border-radius: 12px;
+    box-shadow: 0 10px 35px rgba(40, 20, 80, 0.18);
+    color: #29213d;
+    font-size: 14px;
+    font-weight: 600;
+    animation: noticeSlide 0.35s ease;
+}
+
+.custom-notice strong {
+    display: block;
+    color: #5426c7;
+    font-size: 15px;
+    margin-bottom: 5px;
+}
+
+@keyframes noticeSlide {
+    from {
+        opacity: 0;
+        transform: translateX(35px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">SecureSpace</div>
+    <a class="back" href="{{ url_for('dashboard') }}">Dashboard</a>
+</nav>
+
+<div class="container">
+    <div class="heading">
+        <h1>Upload Your Document</h1>
+        <p>Securely store and manage your important files.</p>
+    </div>
+
+    <div class="upload-card">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST"
+              action="{{ url_for('documents.upload_document') }}"
+              enctype="multipart/form-data"
+              id="uploadForm">
+
+            <div class="drop-zone" id="dropZone">
+                <div class="upload-prompt" id="uploadPrompt">
+                    <div class="upload-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#5426c7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 16V4"></path>
+                            <path d="M7 9l5-5 5 5"></path>
+                            <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path>
+                        </svg>
+                    </div>
+                    <h3>Drag and drop your file here</h3>
+                    <p>Or click below to browse files</p>
+                    <span class="browse">Browse Files</span>
+                </div>
+
+                <input type="file"
+                       name="file"
+                       id="fileInput"
+                       accept=".pdf,.docx,.txt,.png,.jpg,.jpeg"
+                       >
+
+                <div class="file-details" id="fileDetails">
+                    <div class="file-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#5426c7" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <path d="M14 2v6h6"></path>
+                            <path d="M8 13h8M8 17h8"></path>
+                        </svg>
+                    </div>
+                    <div class="file-info">
+                        <strong id="fileName"></strong>
+                        <span id="fileSize"></span>
+                    </div>
+                    <button type="button" class="remove-file" id="removeFile">Remove file</button>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="category">Document Category</label>
+                <select name="category" id="category">
+                    <option value="General">General</option>
+                    <option value="Personal">Personal</option>
+                    <option value="Work">Work</option>
+                    <option value="Education">Education</option>
+                    <option value="Finance">Finance</option>
+                </select>
+            </div>
+
+            <button type="submit" class="upload-button" id="uploadButton">
+                Upload Securely
+            </button>
+        </form>
+
+        <p class="footer-note">
+            PDF: 500 MB | DOCX: 100 MB | TXT: 10 MB | Images: 50 MB
+        </p>
+    </div>
+</div>
+
+<script>
+const dropZone = document.getElementById("dropZone");
+const fileInput = document.getElementById("fileInput");
+const uploadPrompt = document.getElementById("uploadPrompt");
+const fileDetails = document.getElementById("fileDetails");
+const fileName = document.getElementById("fileName");
+const fileSize = document.getElementById("fileSize");
+const removeFile = document.getElementById("removeFile");
+const uploadForm = document.getElementById("uploadForm");
+const uploadButton = document.getElementById("uploadButton");
+
+function showNotice(message) {
+    const oldNotice = document.querySelector(".custom-notice");
+
+    if (oldNotice) {
+        oldNotice.remove();
+    }
+
+    const notice = document.createElement("div");
+    notice.className = "custom-notice";
+
+    const title = document.createElement("strong");
+    title.textContent = "SecureSpace";
+
+    const text = document.createElement("span");
+    text.textContent = message;
+
+    notice.appendChild(title);
+    notice.appendChild(text);
+
+    document.body.appendChild(notice);
+
+    setTimeout(() => {
+        notice.style.opacity = "0";
+        notice.style.transition = "opacity 0.3s";
+        setTimeout(() => notice.remove(), 300);
+    }, 3500);
+}
+
+
+const maxFileSizes = {
+    pdf: 500 * 1024 * 1024,
+    docx: 100 * 1024 * 1024,
+    txt: 10 * 1024 * 1024,
+    png: 50 * 1024 * 1024,
+    jpg: 50 * 1024 * 1024,
+    jpeg: 50 * 1024 * 1024
+};
+
+const allowed = Object.keys(maxFileSizes);
+
+function showFile(file) {
+    if (!file) return false;
+
+    const extension = file.name.split(".").pop().toLowerCase();
+
+    if (!allowed.includes(extension)) {
+        showNotice("This file type is not supported.");
+        return false;
+    }
+
+    const maxSize = maxFileSizes[extension];
+
+    if (file.size > maxSize) {
+        const limitMB = maxSize / (1024 * 1024);
+        showNotice("Maximum allowed size for " + extension.toUpperCase() + " is " + limitMB + " MB.");
+        return false;
+    }
+
+    fileName.textContent = file.name;
+    fileSize.textContent = file.size < 1048576
+        ? (file.size / 1024).toFixed(1) + " KB"
+        : (file.size / 1048576).toFixed(2) + " MB";
+
+    uploadPrompt.style.display = "none";
+    fileDetails.style.display = "flex";
+    return true;
+}
+
+fileInput.addEventListener("change", function() {
+    if (!showFile(this.files[0])) {
+        this.value = "";
+    }
+});
+
+dropZone.addEventListener("click", function(event) {
+    if (!event.target.closest("#removeFile")) {
+        fileInput.click();
+    }
+});
+
+["dragenter","dragover"].forEach(function(name) {
+    dropZone.addEventListener(name, function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        dropZone.classList.add("dragging");
+    });
+});
+
+["dragleave","dragend"].forEach(function(name) {
+    dropZone.addEventListener(name, function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        dropZone.classList.remove("dragging");
+    });
+});
+
+dropZone.addEventListener("drop", function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    dropZone.classList.remove("dragging");
+
+    const dropped = event.dataTransfer.files;
+    if (!dropped.length) return;
+
+    const transfer = new DataTransfer();
+    transfer.items.add(dropped[0]);
+    fileInput.files = transfer.files;
+
+    if (!showFile(dropped[0])) {
+        fileInput.value = "";
+    }
+});
+
+removeFile.addEventListener("click", function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    fileInput.value = "";
+    fileDetails.style.display = "none";
+    uploadPrompt.style.display = "block";
+});
+
+uploadForm.addEventListener("submit", function(event) {
+    if (!fileInput.files.length) {
+        event.preventDefault();
+        showNotice("Please select a document first.");
+        return;
+    }
+    uploadButton.textContent = "Uploading...";
+    uploadButton.disabled = true;
+});
+</script>
+</body>
+</html>

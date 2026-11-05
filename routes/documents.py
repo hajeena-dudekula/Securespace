@@ -1,4 +1,4 @@
-import os
+﻿import os
 import uuid
 
 from datetime import datetime, timezone, timedelta
@@ -26,6 +26,20 @@ from models.user import User
 from models.audit_log import AuditLog
 
 documents = Blueprint("documents", __name__, url_prefix="/documents")
+def get_document_storage_path():
+    configured_path = current_app.config.get("DOCUMENT_STORAGE_PATH")
+
+    if configured_path:
+        upload_folder = os.path.abspath(configured_path)
+    else:
+        upload_folder = os.path.join(
+            current_app.instance_path,
+            "documents"
+        )
+
+    os.makedirs(upload_folder, exist_ok=True)
+    return upload_folder
+
 
 ALLOWED_EXTENSIONS = {"pdf", "docx", "txt", "png", "jpg", "jpeg"}
 
@@ -157,10 +171,7 @@ def upload_document():
         extension = safe_name.rsplit(".", 1)[1].lower()
         stored_name = f"{uuid.uuid4().hex}.{extension}"
 
-        upload_folder = os.path.join(
-            current_app.instance_path,
-            "documents"
-        )
+        upload_folder = get_document_storage_path()
 
         os.makedirs(upload_folder, exist_ok=True)
 
@@ -240,10 +251,7 @@ def preview_document(document_id):
         flash("Preview is not supported for this file type.", "error")
         return redirect(url_for("documents.document_list"))
 
-    upload_folder = os.path.join(
-        current_app.instance_path,
-        "documents"
-    )
+    upload_folder = get_document_storage_path()
 
     db.session.add(AuditLog(
         actor_id=current_user.id,
@@ -280,10 +288,7 @@ def download_document(document_id):
 
         return "Access denied", 403
 
-    upload_folder = os.path.join(
-        current_app.instance_path,
-        "documents"
-    )
+    upload_folder = get_document_storage_path()
 
     db.session.add(AuditLog(
         actor_id=current_user.id,
@@ -446,10 +451,7 @@ def delete_document(document_id):
     if current_user.role != "admin" and document.user_id != current_user.id:
         return "Access denied", 403
 
-    upload_folder = os.path.join(
-        current_app.instance_path,
-        "documents"
-    )
+    upload_folder = get_document_storage_path()
 
     file_path = os.path.join(
         upload_folder,
@@ -479,6 +481,7 @@ def delete_document(document_id):
         flash("Document deletion failed.", "error")
 
     return redirect(url_for("documents.document_list"))
+
 
 
 
