@@ -5,3 +5,7 @@ __pycache__/
 instance/
 *.db
 .vscode/
+
+# Temporary backup files
+*_backup.*
+*.bak

@@ -35,6 +35,11 @@ class AuditLog(db.Model):
         nullable=True
     )
 
+    integrity_hash = db.Column(
+        db.String(64),
+        nullable=True
+    )
+
     created_at = db.Column(
         db.DateTime,
         default=lambda: datetime.now(timezone.utc).replace(tzinfo=None),

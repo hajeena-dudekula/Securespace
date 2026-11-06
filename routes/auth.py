@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from extensions import db
+from extensions import db, limiter
 from models.user import User
 
 auth = Blueprint("auth", __name__)
@@ -47,6 +47,7 @@ def register():
 
 
 @auth.route("/login", methods=["GET", "POST"])
+@limiter.limit("5 per minute", methods=["POST"])
 def login():
 
     if request.method == "POST":

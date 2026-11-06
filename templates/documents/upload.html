@@ -215,6 +215,8 @@ body {
               enctype="multipart/form-data"
               id="uploadForm">
 
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
             <div class="drop-zone" id="dropZone">
                 <div class="upload-prompt" id="uploadPrompt">
                     <div class="upload-icon">

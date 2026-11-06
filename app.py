@@ -1,7 +1,10 @@
 from flask import Flask, render_template, redirect, url_for
 from flask_login import LoginManager, login_required, current_user
+from flask_wtf.csrf import CSRFProtect
 
-from extensions import db
+from extensions import db, limiter
+
+csrf = CSRFProtect()
 from config import Config
 from models.user import User
 from models.document import Document
@@ -22,6 +25,8 @@ def create_app(test_config=None):
         app.config.update(test_config)
 
     db.init_app(app)
+    limiter.init_app(app)
+    csrf.init_app(app)
 
     login_manager = LoginManager()
     login_manager.login_view = "auth.login"
@@ -79,7 +84,3 @@ if __name__ == "__main__":
 
 from models.permission import DocumentPermission
 from models.audit_log import AuditLog
-
-
-
-

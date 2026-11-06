@@ -4,9 +4,9 @@
 - Day 2: User authentication implementation completed.
 - Day 3: Document management implementation completed.
 - Day 4: Document authorization, permissions, audit logging, admin activity, and bug fixes completed.
-- Day 5: Deployment planned.
-- Day 6: Security testing planned.
-- Day 7: Final review and submission planned.
+- Day 5: Deployment preparation completed; actual deployment carried forward.
+- Day 6: Security hardening, documentation updates, and automated testing completed (52 tests passed).
+- Day 7: Final review, production deployment, demonstration, and submission planned.
 
 ---
 
@@ -197,3 +197,23 @@
 **Carry forward to Day 6:**
 Complete remaining security testing and production-readiness work, including CSRF, rate limiting, file signature validation, IDOR tests, and deployment preparation.
 
+## Day 6 – Security Hardening and Documentation (November 6, 2026)
+
+**Completed:**
+- Implemented login rate limiting and CSRF protection.
+- Added file content signature validation and upload security tests.
+- Added document owner and date filters.
+- Implemented HMAC-based tamper-evident audit log verification.
+- Added the rule-based Permission Advisor with mandatory owner approval.
+- Added production configuration safeguards for secrets and rate-limit storage.
+- Updated README.md, API.md, PROMPTS.md, and THREATS.md.
+- Ran the full automated test suite: 52 passed, 0 failed.
+
+**Remaining work:**
+- Configure and verify production Redis.
+- Provision a production database and persistent private storage.
+- Deploy the application with HTTPS.
+- Perform live production security verification.
+- Prepare the demonstration and final submission.
+
+---

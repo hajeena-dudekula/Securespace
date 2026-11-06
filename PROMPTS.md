@@ -1,8 +1,8 @@
-# AI Usage Log – SecureSpace
+# AI Usage Log â€“ SecureSpace
 
 ## Project Overview
 
-**Project:** SecureSpace – Secure Document Sharing with a Real Audit Trail
+**Project:** SecureSpace â€“ Secure Document Sharing with a Real Audit Trail
 **Challenge:** Snovasys Fresher Hiring Challenge 2026
 **Technology Stack:** Python, Flask, SQLite, HTML, CSS, JavaScript
 
@@ -12,7 +12,7 @@ AI-generated suggestions were reviewed and adapted to the existing project. They
 
 ---
 
-## Day 1 – Project Analysis and Planning
+## Day 1 â€“ Project Analysis and Planning
 
 ### Prompt 1: Project Analysis and Planning
 
@@ -44,11 +44,11 @@ AI assistance was used to understand the project scope and explore an applicatio
 
 ---
 
-## Day 2 – Authentication and Initial Security
+## Day 2 â€“ Authentication and Initial Security
 
 Date: 2026-11-02
 
-### Entry 1 – User Registration
+### Entry 1 â€“ User Registration
 
 **Prompt objective:**
 
@@ -65,7 +65,7 @@ Received guidance for collecting registration details, hashing passwords, and sa
 - Used password hashing instead of storing plain-text passwords.
 - Registration assigns the default viewer role; users cannot select an administrator role themselves.
 
-### Entry 2 – User Login
+### Entry 2 â€“ User Login
 
 **Prompt objective:**
 
@@ -78,10 +78,10 @@ Received guidance for checking submitted credentials against stored password has
 **Review and remaining work:**
 
 - Password hash verification is used.
-- Login attempt rate limiting has not been implemented.
-- Brute-force protection remains a security improvement.
+- At this stage, login attempt rate limiting had not yet been implemented. It was added and tested during Day 6.
+- Additional brute-force protections beyond the implemented login rate limit remain a possible security improvement.
 
-### Entry 3 – Dashboard Access Control
+### Entry 3 â€“ Dashboard Access Control
 
 **Prompt objective:**
 
@@ -97,7 +97,7 @@ Received guidance for using Flask-Login authentication decorators.
 - Authentication alone is not treated as sufficient authorization for individual documents.
 - Document-level access checks were addressed during the document management and authorization stages.
 
-### Entry 4 – Authentication Security Review
+### Entry 4 â€“ Authentication Security Review
 
 **Prompt objective:**
 
@@ -111,7 +111,7 @@ Received guidance about password storage, authentication, and the difference bet
 
 Document ownership and permission checks were treated as separate requirements and implemented in the later authorization stage.
 
-### Entry 5 – Session and Logout
+### Entry 5 â€“ Session and Logout
 
 **Prompt objective:**
 
@@ -124,15 +124,15 @@ Received guidance for ending the authenticated session.
 **Review and corrections:**
 
 - Logout uses a POST route.
-- CSRF protection still needs to be configured and verified.
+- At this stage, CSRF protection was not yet configured. It was added to relevant forms and tested during Day 6.
 
 ---
 
-## Day 3 – Document Management
+## Day 3 â€“ Document Management
 
 Date: 2026-11-04
 
-### Entry 1 – Document Upload
+### Entry 1 â€“ Document Upload
 
 **Prompt objective:**
 
@@ -151,7 +151,7 @@ Received guidance for handling uploaded files, validating extensions, storing fi
 - Stored uploaded files in the application instance document folder.
 - Added upload success and error messages.
 
-### Entry 2 – Document Listing and Search
+### Entry 2 â€“ Document Listing and Search
 
 **Prompt objective:**
 
@@ -169,7 +169,7 @@ Received guidance for querying document records and displaying them in the appli
 - Added categories: General, Personal, Work, Education, and Finance.
 - Added upload-date ordering and IST display.
 
-### Entry 3 – Document Preview and Download
+### Entry 3 â€“ Document Preview and Download
 
 **Prompt objective:**
 
@@ -187,11 +187,11 @@ Received guidance for serving stored documents through Flask routes.
 
 ---
 
-## Day 4 – Authorization and Audit Trail
+## Day 4 â€“ Authorization and Audit Trail
 
 Date: 2026-11-04
 
-### Entry 1 – Document Permission Model
+### Entry 1 â€“ Document Permission Model
 
 **Prompt objective:**
 
@@ -208,7 +208,7 @@ Received guidance for associating users with documents and storing permission ty
 - Added document and user relationships.
 - Added database constraints for permission values and duplicate document-user permissions.
 
-### Entry 2 – Share and Revoke Access
+### Entry 2 â€“ Share and Revoke Access
 
 **Prompt objective:**
 
@@ -227,7 +227,7 @@ Received guidance for validating target users, assigning permissions, and removi
 - Added permission revocation.
 - Added audit events for granting and revoking permissions.
 
-### Entry 3 – Document Authorization
+### Entry 3 â€“ Document Authorization
 
 **Prompt objective:**
 
@@ -246,7 +246,7 @@ Received guidance for centralizing document access checks and distinguishing own
 - Document modifications require appropriate edit access.
 - Document deletion is restricted to the owner or administrator.
 
-### Entry 4 – Document Management Operations
+### Entry 4 â€“ Document Management Operations
 
 **Prompt objective:**
 
@@ -263,7 +263,7 @@ Received implementation and debugging guidance for document modification and del
 - Added owner and administrator checks.
 - Recorded document modification and deletion events.
 
-### Entry 5 – Audit Trail
+### Entry 5 â€“ Audit Trail
 
 **Prompt objective:**
 
@@ -281,7 +281,7 @@ Received guidance for recording the actor, document reference, action, details, 
 - Restricted the activity page to administrator accounts.
 - Added a dashboard link to the activity page.
 
-### Entry 6 – Debugging and Verification
+### Entry 6 â€“ Debugging and Verification
 
 **Prompt objective:**
 
@@ -300,7 +300,7 @@ Received debugging guidance based on the reported errors and existing source cod
 
 **Verification limitation:**
 
-Compilation confirms syntax validity only. Complete end-to-end authorization and security testing is still pending.
+Compilation confirms syntax validity only. At this development stage, complete end-to-end authorization and security testing was still pending. This was subsequently addressed during Day 6, when the full test suite completed with 52 passing tests.
 
 ---
 
@@ -315,13 +315,13 @@ Compilation confirms syntax validity only. Complete end-to-end authorization and
 
 ## Related Project Documentation
 
-- `PROBLEM_STATEMENT.md` – Project requirements.
-- `THREATS.md` – Security threat analysis and mitigation status.
-- `AI_TOOLS.md` – AI tools and usage information.
-- `PROJECT_PLAN.md` – Development progress and planned work.
-- `PROMPTS.md` – AI assistance and development review log.
+- `PROBLEM_STATEMENT.md` â€“ Project requirements.
+- `THREATS.md` â€“ Security threat analysis and mitigation status.
+- `AI_TOOLS.md` â€“ AI tools and usage information.
+- `PROJECT_PLAN.md` â€“ Development progress and planned work.
+- `PROMPTS.md` â€“ AI assistance and development review log.
 
-### Entry 7 – Deployment Configuration Preparation (November 5, 2026)
+### Entry 7 â€“ Deployment Configuration Preparation (November 5, 2026)
 
 **Prompt objective:**
 
@@ -344,3 +344,163 @@ Received guidance to update application configuration and centralize document st
 
 Actual deployment, production database setup, persistent storage configuration, production secret enforcement, and live verification remain incomplete. The development SECRET_KEY fallback has not yet been removed.
 
+
+---
+
+## Day 6 â€“ Security Hardening and Advanced Features
+
+Date: 2026-11-06
+
+### Entry 1 â€“ Login Rate Limiting and CSRF Protection
+
+**Prompt objective:**
+
+Review the existing Flask authentication and document management forms. Identify ways to reduce repeated login attempts and protect state-changing requests against CSRF attacks without breaking existing functionality.
+
+**AI assistance summary:**
+
+Received implementation and debugging guidance for Flask-Limiter and Flask-WTF CSRF protection.
+
+**Developer review and implementation:**
+
+- Added login rate limiting.
+- Configured a limit of five login attempts per minute.
+- Added CSRF protection to relevant POST forms.
+- Added tests for login rate limiting and CSRF rejection.
+- Ran the full test suite to check existing functionality.
+
+### Entry 2 â€“ File Upload Security
+
+**Prompt objective:**
+
+Review the existing document upload implementation and identify risks involving file extensions, file content, filenames, and storage paths.
+
+**AI assistance summary:**
+
+Received guidance for file signature checks, safe filenames, UUID-based storage names, and private file storage.
+
+**Developer review and implementation:**
+
+- Added file content signature validation for supported formats.
+- Used secure filename handling and UUID-based stored filenames.
+- Added upload security tests.
+- Checked private storage and unauthorized file access behaviour.
+
+**Verification note:**
+
+File signature checks provide an additional validation layer; they are not a replacement for complete file-format security scanning.
+
+### Entry 3 â€“ Document Search and Filters
+
+**Prompt objective:**
+
+Extend document filtering to support owner and upload-date filters while preserving existing document visibility and authorization rules.
+
+**AI assistance summary:**
+
+Received guidance for updating SQLAlchemy queries and applying date boundaries consistently.
+
+**Developer review and implementation:**
+
+- Added owner filtering for administrators.
+- Prevented non-administrator users from using the owner filter to access other users' documents.
+- Added date-from and date-to filters.
+- Added tests for document filtering.
+
+### Entry 4 â€“ Audit Log Integrity
+
+**Prompt objective:**
+
+Review the existing audit log and explore a way to detect unauthorized modification of stored audit records.
+
+**AI assistance summary:**
+
+Received guidance for creating a hash-linked audit record sequence using HMAC and SHA-256.
+
+**Developer review and implementation:**
+
+- Added an integrity hash field to audit records.
+- Implemented HMAC-based audit record signing.
+- Linked each record to the previous record's hash.
+- Added audit-chain verification logic.
+- Backfilled existing audit records.
+- Added audit integrity tests.
+- Verified the existing audit chain.
+
+**Security consideration:**
+
+The implementation provides tamper-evident verification. It is not claimed to be completely tamper-proof against an attacker who can control the database and signing secret.
+
+### Entry 5 â€“ Permission Advisor
+
+**Prompt objective:**
+
+Explore a permission suggestion feature that helps document owners decide whether a user should receive Read or Edit access.
+
+**AI assistance summary:**
+
+Received guidance for implementing an explainable, purpose-based permission recommendation mechanism.
+
+**Developer review and implementation:**
+
+- Added a separate Permission Advisor service.
+- Used the document category and stated purpose to recommend Read or Edit access.
+- Added explanations for the recommendations.
+- Kept final permission approval with the document owner.
+- Did not automatically grant or change permissions.
+- Added tests for recommendation logic and route authorization.
+
+**Implementation clarification:**
+
+The current Permission Advisor is a rule-based recommendation engine. It is not represented as an integrated machine-learning or external LLM model.
+
+### Entry 6 â€“ Authorization and Security Test Review
+
+**Prompt objective:**
+
+Review document routes for unauthorized operations and add tests covering access denial, permission boundaries, and audit recording.
+
+**AI assistance summary:**
+
+Received debugging and test-design guidance for owner, viewer, editor, and administrator access scenarios.
+
+**Developer review and verification:**
+
+- Reviewed document access restrictions.
+- Added and updated authorization tests.
+- Checked denied document operations and security-event logging.
+- Verified Permission Advisor owner restrictions.
+- Ran the complete test suite.
+
+**Latest verification result:**
+
+52 passed, 12 warnings, 0 failed.
+
+The remaining warnings relate to SQLAlchemy Query.get() deprecation.
+
+### Entry 7 â€“ Production Configuration Review
+
+**Prompt objective:**
+
+Review the deployment configuration, application entrypoint, secret handling, and rate-limit storage requirements before production deployment.
+
+**AI assistance summary:**
+
+Received guidance for separating development and production configuration, validating production secrets, correcting the WSGI entrypoint, and requiring persistent rate-limit storage.
+
+**Developer review and implementation:**
+
+- Added production checks for SECRET_KEY and AUDIT_LOG_SECRET.
+- Added minimum secret-length validation.
+- Enabled secure session cookies in production.
+- Updated run.py to load the root app.py implementation explicitly.
+- Added Gunicorn and Redis to requirements.txt.
+- Added production enforcement to prevent memory-based rate limiting.
+- Ran Python syntax checks and the full test suite.
+
+**Verification limitations:**
+
+- A production Redis service has not yet been connected.
+- Actual production deployment has not been completed.
+- Production database and persistent document storage still require configuration.
+- Live deployment verification remains pending.

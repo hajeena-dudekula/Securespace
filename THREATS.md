@@ -3,245 +3,323 @@
 ## 1. Project Information
 
 - **Project:** SecureSpace – Secure Document Sharing with a Real Audit Trail
+- **Challenge:** Snovasys Fresher Hiring Challenge 2026
 - **Application:** Flask-based document-sharing application
-- **Database:** SQLite
-- **Review date:** 2026-11-05
+- **Database:** SQLite (current development configuration)
+- **Review date:** 2026-11-06
 
 ## 2. Purpose
 
-This document identifies security threats, records currently implemented controls, and lists security improvements that still require implementation or testing.
+This document identifies security threats affecting SecureSpace, describes the controls implemented to mitigate them, and records the remaining limitations.
 
-A feature is not considered fully secure only because its code exists. Its behavior must also be tested.
+The security objective is to prevent unauthorized users from accessing confidential documents and maintain an accountable record of document activities.
+
+A security control is not considered fully verified merely because its code exists. Relevant tests and deployment checks are also required.
 
 ## 3. Threat Register
 
 ### Threat 1 – Unauthorized Document Access
 
-**Risk:** A user may try to access another user's document without permission.
+**Risk:** A user may attempt to access another user's document by changing a document ID or directly requesting a preview or download URL.
 
-**Current controls:**
+**Implemented controls:**
 - Login is required for protected document operations.
-- Document ownership and sharing permissions are checked.
-- Preview and download routes check access.
+- Document ownership and sharing permissions are checked on the server.
+- Preview and download routes perform document-level access checks.
+- Stored filenames use UUID-based identifiers.
+- Private document storage is used instead of exposing uploaded files through public static routes.
 
-**Verified:** Unauthorized preview and download attempts were tested and returned HTTP 403. Denied attempts generated audit records.
+**Verification:**
+- Cross-user document access scenarios are covered by authorization tests.
+- Unauthorized preview and download attempts are tested.
+- Denied access attempts generate security audit events.
 
-**Remaining work:** Test modified document IDs (IDOR) and additional unauthorized access scenarios.
+**Remaining limitations:**
+- Live production access-control behavior still requires deployment verification.
+- Additional testing with production database and storage configuration is required.
 
-**Status:** Basic access-control tests passed; IDOR testing pending.
+**Status:** Core authorization and cross-user tests implemented.
 
-### Threat 2 – Broken Access Control
+### Threat 2 – Broken Access Control and Privilege Escalation
 
-**Risk:** A user may attempt actions beyond their assigned permissions.
+**Risk:** A viewer or editor may attempt operations beyond their assigned permissions.
 
-**Current controls:**
-- Read and edit permissions are supported.
-- Document modifications require edit access.
+**Implemented controls:**
+- Read and Edit permissions are supported.
+- Document modifications require appropriate edit access.
 - Sharing and revocation are restricted to document owners.
-- Deletion is restricted to owners and administrators.
-- Administrator activity access checks the administrator role.
+- Document deletion is restricted to owners and administrators.
+- Administrator activity access is restricted by role.
+- Permission Advisor suggestions do not automatically grant permissions.
 
-**Verified:** Owner, viewer, and administrator access boundaries were tested. Viewers were blocked from editing, deleting, and accessing administrator activity.
+**Verification:**
+- Owner, viewer, editor, and administrator access boundaries have test coverage.
+- Unauthorized sharing, revocation, editing, and deletion attempts are covered.
+- Permission Advisor authorization tests verify that unauthorized users cannot request suggestions for another owner's document.
 
-**Remaining work:** Test additional editor restrictions and role-escalation scenarios.
+**Remaining limitations:**
+- Continue reviewing every new document-related endpoint whenever functionality changes.
 
-**Status:** Core authorization tests passed; additional testing pending.
+**Status:** Core authorization controls implemented and tested.
 
 ### Threat 3 – Malicious or Invalid File Uploads
 
-**Risk:** An attacker may upload unsupported, oversized, or malicious files.
+**Risk:** An attacker may upload unsupported, oversized, malformed, or potentially harmful files.
 
-**Current controls:**
-- Allowed extensions are restricted to PDF, DOCX, TXT, PNG, JPG, and JPEG.
-- File-size limits are configured by file type.
+**Implemented controls:**
+- Allowed extensions are restricted to supported document and image formats.
+- File-size restrictions are configured.
 - Secure filename handling is used.
-- UUID-based stored filenames are used.
-- Files are stored in the application instance folder.
+- UUID-based stored filenames reduce filename collision and path manipulation risks.
+- File content signature checks are implemented for supported formats.
+- Uploaded files are stored in private storage.
+- Upload security tests are included.
 
-**Remaining work:**
-- Validate actual file content and signatures.
-- Add malware scanning.
-- Test malformed and potentially harmful files.
+**Remaining limitations:**
+- File signature validation is not a complete malware detection mechanism.
+- No malware scanning service is currently integrated.
+- Malformed-file and advanced content-based attacks require additional testing.
 
-**Status:** Basic upload restrictions implemented; stronger validation pending.
+**Status:** Basic upload restrictions, signature validation, and security tests implemented.
 
-### Threat 4 – Audit Log Tampering
+### Threat 4 – Audit Log Modification or Deletion
 
-**Risk:** An attacker may try to modify or delete audit records.
+**Risk:** An attacker may modify or delete audit records to hide document activity.
 
-**Current controls:**
-- AuditLog records actor, document reference, action, details, IP address, and timestamp.
-- Important document operations create audit entries.
-- Administrator activity access is restricted.
+**Implemented controls:**
+- Audit records contain actor, document reference, action, details, IP address, and timestamp.
+- Important document operations create audit events.
+- Denied access attempts are recorded.
+- Audit records are linked using HMAC-based SHA-256 integrity hashes.
+- A verification function checks the audit chain.
+- Existing audit records were backfilled with integrity hashes.
+- Audit integrity tests are included.
 
-**Remaining work:**
-- Add independent or append-only audit storage.
-- Test audit-log integrity and tampering resistance.
+**Remaining limitations:**
+- Audit records currently use application database storage.
+- External immutable or append-only audit storage is not configured.
+- Deletion of the final audit record may not be detected by an internal chain alone.
+- An attacker controlling both the database and signing secret may be able to reconstruct the chain.
+- The audit signing secret must remain stable; changing it without a planned migration will invalidate existing verification.
 
-**Status:** Audit logging implemented; tamper resistance pending.
+**Status:** Tamper-evident audit chain implemented and tested. External tamper-resistant storage remains pending.
 
 ### Threat 5 – Permission Revocation Failure
 
-**Risk:** A user may retain document access after permission is revoked.
+**Risk:** A previously authorized user may retain access after the owner revokes permission.
 
-**Current controls:**
-- A revocation route removes the user's permission.
-- Document access checks use current permission records.
+**Implemented controls:**
+- Owners can revoke document permissions.
+- Access checks use current permission records.
+- Preview and download requests perform authorization checks rather than relying only on an earlier session decision.
 
-**Verified:** Revoked viewer access was tested; subsequent download attempts returned HTTP 403.
+**Verification:**
+- Revoked-user access behavior is covered by permission tests.
+- Subsequent unauthorized document operations are expected to be denied.
 
-**Remaining work:** Add a dedicated revoke-then-preview test and additional revocation edge cases.
+**Remaining limitations:**
+- Production database and multi-worker behavior require live verification.
 
-**Status:** Revocation download behavior tested; additional testing pending.
+**Status:** Revocation functionality and authorization tests implemented.
 
-### Threat 6 – Session Hijacking and Session Misuse
+### Threat 6 – Session Hijacking and CSRF
 
-**Risk:** An attacker may misuse an exposed or stolen authenticated session.
+**Risk:** An attacker may misuse an exposed authenticated session or trick a logged-in user into submitting an unwanted state-changing request.
 
-**Current controls:**
-- Flask-Login manages authenticated sessions.
+**Implemented controls:**
+- Flask-Login manages authentication sessions.
 - Logout uses POST.
+- Flask-WTF CSRF protection is configured.
+- CSRF tokens are included in relevant POST forms.
+- HTTP-only session cookies are enabled.
+- SameSite=Lax is configured.
+- Secure cookies are enabled in production configuration.
 
-**Remaining work:**
-- Configure and verify CSRF protection.
-- Verify secure cookie settings.
-- Verify HTTPS during deployment.
+**Verification:**
+- CSRF rejection has a dedicated test.
+- Authentication and logout behavior are covered by tests.
 
-**Status:** Basic session management implemented; additional security pending.
+**Remaining limitations:**
+- HTTPS and secure cookie behavior must be verified on the actual production deployment.
+- Session security requires review whenever new state-changing routes or forms are introduced.
+
+**Status:** Core session and CSRF protections implemented; production verification pending.
 
 ### Threat 7 – SQL Injection
 
 **Risk:** Malicious input may attempt to manipulate database queries.
 
-**Current controls:**
+**Implemented controls:**
 - SQLAlchemy ORM is used for database operations.
+- Document search and filtering use ORM query construction.
 
-**Remaining work:** Review database access paths and perform injection testing.
+**Remaining limitations:**
+- Dedicated SQL injection testing should be performed against relevant input paths.
+- Any future raw SQL must use parameterized queries.
 
-**Status:** ORM-based database access implemented; security testing pending.
+**Status:** ORM-based database access implemented; dedicated injection testing remains a review item.
 
 ### Threat 8 – Brute-Force Login Attempts
 
 **Risk:** An attacker may repeatedly guess account passwords.
 
-**Current controls:**
-- Password hashes are verified during login.
+**Implemented controls:**
+- Werkzeug password hashing is used.
+- Flask-Limiter is configured for login rate limiting.
+- The login POST endpoint has a limit of five attempts per minute.
+- A rate-limit test verifies that excessive login attempts are rejected.
 
-**Remaining work:**
-- Implement login rate limiting.
-- Consider additional login abuse protections.
+**Remaining limitations:**
+- Production requires an accessible Redis service for shared rate-limit storage.
+- The Python Redis dependency is installed, but a live Redis service has not yet been connected.
 
-**Status:** Rate limiting not implemented.
+**Status:** Login rate limiting implemented and tested; production Redis configuration pending.
 
 ### Threat 9 – Weak Password Storage
 
-**Risk:** Plain-text password storage could expose user passwords.
+**Risk:** Plain-text password storage could expose user passwords if the database is compromised.
 
-**Current controls:**
+**Implemented controls:**
 - Werkzeug password hashing is used.
-- Password verification uses stored hashes.
+- Password verification uses stored password hashes.
+- Registration does not store submitted passwords as plain text.
+- Default registration assigns the viewer role.
 
-**Remaining work:** Verify stored password values in the database.
+**Remaining limitations:**
+- Continue checking password-handling changes during future reviews.
 
-**Status:** Password hashing implemented; database verification pending.
+**Status:** Password hashing implemented.
 
 ### Threat 10 – Insecure Production Configuration
 
-**Risk:** Development secrets or insecure deployment settings may expose the application.
+**Risk:** Development secrets, insecure cookies, temporary storage, or incorrect application startup configuration may expose the application.
 
-**Current controls:**
-- The application uses a configurable SECRET_KEY setting.
+**Implemented controls:**
+- Environment-based configuration is supported.
+- Production requires SECRET_KEY and AUDIT_LOG_SECRET.
+- Production secret values must meet the configured minimum length.
+- Production session cookies are configured as secure.
+- Production rate limiting rejects the memory-only backend.
+- Configurable document storage paths are supported.
+- The deployment entrypoint loads the root application implementation.
+- Gunicorn and Redis dependencies are listed in requirements.txt.
 
-**Remaining work:**
-- Replace the development fallback secret.
-- Configure production secret management.
-- Verify HTTPS and production settings.
+**Remaining limitations:**
+- A production hosting provider has not yet been configured.
+- Production database provisioning and migration strategy remain pending.
+- Persistent private file storage must be configured and tested.
+- A real Redis service must be connected.
+- HTTPS and live deployment behavior must be verified.
+- Production secrets must be stored securely outside the repository.
 
-**Status:** Production hardening pending.
+**Status:** Production configuration safeguards implemented; actual deployment remains pending.
 
-## 4. Security Testing Plan
+## 4. Security Testing Coverage
 
-The following tests are required:
+The current automated test suite includes coverage for:
 
-1. Open protected pages without logging in.
-2. Attempt to access another user's document using a modified document ID.
-3. Verify viewers cannot edit, share, revoke, or delete documents.
-4. Verify editors cannot perform owner-only operations.
-5. Verify administrator access restrictions.
-6. Revoke a shared user's permission and test access again.
-7. Test unsupported file extensions and oversized files.
-8. Verify audit entries for supported document operations.
-9. Attempt to access the administrator activity page without administrator privileges.
-10. Review session cookies, CSRF protection, and login abuse controls.
+1. Authentication and protected routes.
+2. Document ownership and cross-user access restrictions.
+3. Viewer, editor, owner, and administrator permissions.
+4. Sharing and revocation behavior.
+5. Unauthorized preview and download attempts.
+6. Denied-access audit events.
+7. Upload security and file validation.
+8. Audit-chain integrity verification.
+9. Document owner and date filters.
+10. Permission Advisor recommendations and authorization.
+11. Login rate limiting.
+12. CSRF protection.
+
+**Latest full test result (2026-11-06):**
+
+- Passed: 52
+- Failed: 0
+- Warnings: 12
+
+The 12 warnings relate to SQLAlchemy Query.get() deprecation and are not test failures.
+
+Passing automated tests do not establish that every possible attack has been prevented. Production testing and additional security review remain necessary.
 
 ## 5. Current Security Status
 
-| Security area | Status |
+| Security area | Current status |
 |---|---|
 | Password hashing | Implemented |
-| Login protection | Implemented |
-| Dashboard authentication | Implemented |
-| Document access checks | Implemented |
-| Read/Edit permissions | Implemented |
-| Share and revoke routes | Implemented |
-| Owner/admin deletion checks | Implemented |
-| Basic upload restrictions | Implemented |
-| Audit event recording | Implemented |
-| Administrator activity access check | Implemented |
-| Login rate limiting | Pending |
-| CSRF protection | Pending |
-| File signature validation | Pending |
-| Malware scanning | Pending |
-| Production secret configuration | Pending |
-| End-to-end security testing | In progress - 18 tests passed; additional scenarios pending |
-| Audit log tamper resistance | Pending |
+| User authentication | Implemented |
+| Role-based access checks | Implemented and tested |
+| Document ownership checks | Implemented and tested |
+| Read/Edit permissions | Implemented and tested |
+| Share and revoke operations | Implemented and tested |
+| Unauthorized access logging | Implemented and tested |
+| Private document storage | Implemented |
+| File extension and size restrictions | Implemented |
+| File signature validation | Implemented and tested |
+| Path traversal protection | Implemented and tested |
+| Login rate limiting | Implemented and tested |
+| CSRF protection | Implemented and tested |
+| HMAC audit integrity chain | Implemented and tested |
+| Document search and filters | Implemented and tested |
+| Permission Advisor | Implemented; owner approval required |
+| SQL injection review | ORM used; dedicated testing pending |
+| Malware scanning | Not implemented |
+| External immutable audit storage | Not implemented |
+| Production secret validation | Implemented |
+| Production Redis service | Not configured |
+| Production database and persistent storage | Pending |
+| Live HTTPS deployment verification | Pending |
 
-## 6. Important Limitations
+## 6. Accepted Security Gaps and Limitations
 
-- Syntax checks do not prove application security.
-- Access-control behavior must be tested with multiple accounts.
-- Database-backed audit logs are not equivalent to tamper-proof external storage.
-- Extension validation alone cannot guarantee file safety.
-- The application should not be considered production-ready until remaining security gaps are addressed.
+- File signature checks cannot guarantee that an uploaded file is harmless.
+- Malware scanning is not currently integrated.
+- The HMAC audit chain is tamper-evident, not completely tamper-proof.
+- Database-backed audit records do not provide the same guarantees as independent immutable storage.
+- Audit signing secrets must be protected and kept consistent with existing records.
+- The in-memory rate-limit backend is suitable only for development; production requires Redis.
+- Production security settings have not yet been verified on a live deployment.
+- Automated tests cover identified scenarios but cannot prove the absence of all vulnerabilities.
 
 ## 7. Review History
 
-**Day 1 – Initial Threat Identification**
+### Day 1 – Initial Threat Identification
 
-Identified unauthorized access, broken access control, malicious uploads, audit tampering, permission revocation failure, session misuse, and SQL injection.
+Identified unauthorized document access, broken access control, malicious uploads, audit modification, permission revocation failure, session misuse, and SQL injection as important risks.
 
-**Day 2 – Authentication Security**
+### Day 2 – Authentication Security
 
-Implemented password hashing, login, dashboard authentication, and POST-based logout. Identified rate limiting and CSRF protection as remaining work.
+Implemented registration, login, password hashing, authenticated dashboard access, and POST-based logout.
 
-**Day 3 – Document Management**
+### Day 3 – Document Management
 
-Implemented basic file-type and file-size restrictions, document storage, listing, preview, and download access checks.
+Implemented document upload, listing, search, preview, download, category handling, and basic file restrictions.
 
-**Day 4 – Authorization and Audit Trail**
+### Day 4 – Authorization and Audit Trail
 
-Implemented document-level permissions, sharing, revocation, owner/admin checks, and audit event recording.
+Implemented document-level permissions, sharing, revocation, owner and administrator checks, and activity logging.
 
-**Day 4 - Security Testing Verification (November 5, 2026)**
+### Day 5 – Deployment Preparation (November 5, 2026)
 
-Added pytest authentication and authorization coverage. The full test suite passed with 18 tests and 0 failures. Verified owner, viewer, and administrator access boundaries, sharing, revocation, denied preview/download responses, denied-access audit records, and administrator activity restrictions. Nine SQLAlchemy deprecation warnings remain for future cleanup.
+- Added environment-based application configuration.
+- Added configurable private document storage path handling.
+- Updated upload, preview, download, and deletion operations to use the storage helper.
+- Verified application syntax and existing tests.
+- Actual production deployment remained pending.
 
-**Remaining security work:** IDOR testing, upload validation tests, CSRF, rate limiting, production hardening, and audit tamper resistance.
+### Day 6 – Security Hardening (November 6, 2026)
 
-**Next Review**
+- Added login rate limiting and tests.
+- Added CSRF protection and rejection testing.
+- Added file signature validation and upload security tests.
+- Added document owner and date filters.
+- Added HMAC-based audit-chain integrity verification.
+- Added Permission Advisor with mandatory owner approval.
+- Added production secret validation.
+- Updated the application entrypoint.
+- Added production Redis enforcement.
+- Ran the full automated test suite: 52 passed, 0 failed.
 
-Perform end-to-end security testing, address remaining gaps, and update this document based on actual test results.
+### Next Review
 
-
-**Day 5 – Deployment Preparation Review (November 5, 2026)**
-
-- Added environment-variable support for application secrets, database configuration, secure session cookies, and document storage.
-- Added configurable document storage path handling for upload, preview, download, and deletion.
-- Full automated test suite passed: 18 tests, 0 failures.
-- Production secret enforcement is not complete because the development fallback remains.
-- Production database, persistent disk, HTTPS deployment, and live verification have not been completed.
-- Existing database-backed audit logs are not tamper-proof.
-- No claim of production readiness is made.
-
-**Carry-forward risks:** CSRF protection, login rate limiting, file signature validation, malware scanning, IDOR testing, production hardening, and audit-log tamper resistance remain to be addressed.
+Complete production Redis configuration, database and persistent storage setup, live HTTPS deployment, malware-scanning evaluation, and external audit-storage evaluation.
 
