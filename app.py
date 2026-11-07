@@ -41,7 +41,7 @@ def create_app(test_config=None):
 
     @app.route("/")
     def home():
-        return redirect(url_for("auth.login"))
+        return render_template("landing.html")
 
     @app.route("/dashboard")
     @login_required
@@ -67,6 +67,22 @@ def create_app(test_config=None):
             "admin/activity.html",
             activities=activities
         )
+
+    @app.route("/activity/history")
+    @login_required
+    def user_activity_history():
+
+        activities = AuditLog.query.filter_by(
+            actor_id=current_user.id
+        ).order_by(
+            AuditLog.created_at.desc()
+        ).limit(100).all()
+
+        return render_template(
+            "activity/history.html",
+            activities=activities
+        )
+
     with app.app_context():
         db.create_all()
 

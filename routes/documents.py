@@ -1,4 +1,4 @@
-import hashlib
+﻿import hashlib
 import hmac
 import json
 import os
@@ -348,6 +348,10 @@ def document_list():
 @documents.route("/upload", methods=["GET", "POST"])
 @login_required
 def upload_document():
+
+    if current_user.role not in {"owner", "admin"}:
+        flash("Upload permission required. Only Owners can upload documents.", "error")
+        return redirect(url_for("documents.document_list"))
 
     if request.method == "POST":
 
@@ -778,3 +782,4 @@ def delete_document(document_id):
         flash("Document deletion failed.", "error")
 
     return redirect(url_for("documents.document_list"))
+

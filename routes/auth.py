@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+﻿from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -16,9 +16,14 @@ def register():
         username = request.form.get("username", "").strip()
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
+        role = request.form.get("role", "viewer").strip().lower()
 
         if not username or not email or not password:
             flash("Please fill all required fields.")
+            return redirect(url_for("auth.register"))
+
+        if role not in {"owner", "viewer"}:
+            flash("Please select a valid account role.")
             return redirect(url_for("auth.register"))
 
         existing_user = User.query.filter(
@@ -34,7 +39,7 @@ def register():
             username=username,
             email=email,
             password=generate_password_hash(password),
-            role="viewer"
+            role=role
         )
 
         db.session.add(account)

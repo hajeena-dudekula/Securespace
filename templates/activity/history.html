@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SecureSpace | Activity History</title>
+<style>
+:root {
+    --bg: #171923;
+    --panel: #222630;
+    --orange: #ff8057;
+    --mint: #54d6c5;
+    --text: #f5f5f2;
+    --muted: #a2a7b3;
+    --border: rgba(255,255,255,.075);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    min-height:100vh;
+    padding:40px 6%;
+    background:
+        radial-gradient(ellipse at 85% 5%, rgba(84,214,197,.09), transparent 35%),
+        radial-gradient(ellipse at 10% 90%, rgba(255,128,87,.08), transparent 35%),
+        var(--bg);
+    color:var(--text);
+    font-family:'DM Sans',Arial,sans-serif;
+}
+.container { max-width:1100px; margin:auto; }
+h1 { font-size:32px; margin-bottom:10px; }
+.subtitle { color:var(--muted); margin-bottom:28px; }
+.panel {
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:24px;
+    overflow-x:auto;
+}
+table { width:100%; border-collapse:collapse; text-align:left; }
+th,td { padding:16px 12px; border-bottom:1px solid var(--border); }
+th { color:var(--mint); font-size:13px; }
+td { color:var(--text); font-size:14px; }
+.empty { color:var(--muted); padding:24px 0; }
+.back {
+    display:inline-block;
+    margin-top:24px;
+    color:var(--orange);
+    text-decoration:none;
+    font-weight:600;
+}
+.back:hover { color:var(--mint); }
+@media(max-width:600px) {
+    body { padding:25px 16px; }
+    h1 { font-size:26px; }
+    th,td { padding:12px 8px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Activity History</h1>
+    <p class="subtitle">Track actions performed by your account.</p>
+
+    <div class="panel">
+    {% if activities %}
+        <table>
+            <thead>
+                <tr><th>Action</th><th>Details</th><th>Date &amp; Time</th></tr>
+            </thead>
+            <tbody>
+            {% for activity in activities %}
+                <tr>
+                    <td>{{ activity.action|replace("_", " ")|title }}</td>
+                    <td>{{ activity.details or "?" }}</td>
+                    <td>{{ activity.created_at.strftime("%d %b %Y, %I:%M %p") if activity.created_at else "?" }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="empty">No activity history found for your account.</p>
+    {% endif %}
+    </div>
+
+    <a class="back" href="{{ url_for('dashboard') }}">? Back to Dashboard</a>
+</div>
+</body>
+</html>

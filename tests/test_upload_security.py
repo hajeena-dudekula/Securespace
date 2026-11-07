@@ -170,3 +170,27 @@ def test_uploaded_file_is_not_publicly_accessible(
             f"/static/{document.stored_filename}"
         )
         assert response.status_code == 404
+
+
+def test_viewer_cannot_upload_document(client, app, login_as):
+    login_as("testviewer", "ViewerPass123!")
+
+    with app.app_context():
+        before_count = Document.query.count()
+
+    response = client.post(
+        "/documents/upload",
+        data={
+            "category": "General",
+            "file": (
+                io.BytesIO(b"Viewer upload attempt"),
+                "viewer.txt"
+            )
+        },
+        content_type="multipart/form-data"
+    )
+
+    assert response.status_code == 302
+
+    with app.app_context():
+        assert Document.query.count() == before_count

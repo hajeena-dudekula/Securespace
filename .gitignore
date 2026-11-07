@@ -9,3 +9,6 @@ instance/
 # Temporary backup files
 *_backup.*
 *.bak
+
+# Local template backups
+*.backup

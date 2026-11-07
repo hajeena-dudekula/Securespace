@@ -567,37 +567,28 @@ body {
                         {% if file.user_id == current_user.id %}
 
                             <form method="POST"
+                                  action="{{ url_for('documents.suggest_document_permission', document_id=file.id) }}"
+                                  class="management-form">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <h4>AI Permission Advisor</h4>
+                                <input type="text" name="username"
+                                       placeholder="Enter username" required>
+                                <input type="text" name="purpose"
+                                       placeholder="Why do they need access?" required>
+                                <button type="submit">Get Suggestion</button>
+                            </form>
+
+                            <form method="POST"
                                   action="{{ url_for('documents.share_document', document_id=file.id) }}"
                                   class="management-form">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-                                <form method="POST"
-      action="{{ url_for('documents.suggest_document_permission', document_id=file.id) }}"
-      class="management-form">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-    <h4>Permission Advisor</h4>
-
-    <input type="text" name="username"
-           placeholder="Enter username" required>
-
-    <input type="text" name="purpose"
-           placeholder="Why do they need access?" required>
-
-    <button type="submit">Get Suggestion</button>
-</form>
-<h4>Share Document</h4>
-
-                                <input type="text"
-                                       name="username"
-                                       placeholder="Enter username"
-                                       required>
-
+                                <h4>Share Document</h4>
+                                <input type="text" name="username"
+                                       placeholder="Enter username" required>
                                 <select name="permission" required>
                                     <option value="read">Viewer</option>
                                     <option value="edit">Editor</option>
                                 </select>
-
                                 <button type="submit">Share</button>
                             </form>
 

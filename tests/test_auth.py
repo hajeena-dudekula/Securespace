@@ -81,3 +81,46 @@ def test_login_rejects_missing_csrf_token(client, app):
     )
 
     assert response.status_code == 400
+
+
+def test_registration_creates_owner_account(client, app):
+    from models.user import User
+
+    response = client.post(
+        "/register",
+        data={
+            "username": "newowner",
+            "email": "newowner@test.local",
+            "password": "OwnerPassword123!",
+            "role": "owner"
+        },
+        follow_redirects=True
+    )
+
+    assert response.status_code == 200
+
+    with app.app_context():
+        account = User.query.filter_by(username="newowner").first()
+        assert account is not None
+        assert account.role == "owner"
+
+
+def test_registration_rejects_admin_role(client, app):
+    from models.user import User
+
+    response = client.post(
+        "/register",
+        data={
+            "username": "fakeadmin",
+            "email": "fakeadmin@test.local",
+            "password": "AdminPassword123!",
+            "role": "admin"
+        },
+        follow_redirects=True
+    )
+
+    assert response.status_code == 200
+
+    with app.app_context():
+        account = User.query.filter_by(username="fakeadmin").first()
+        assert account is None
