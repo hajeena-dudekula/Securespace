@@ -23,3 +23,7 @@ limiter = Limiter(
     default_limits=[],
     storage_uri=rate_limit_storage
 )
+
+from authlib.integrations.flask_client import OAuth
+
+oauth = OAuth()

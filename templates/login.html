@@ -368,9 +368,9 @@ a {
             OR
         </div>
 
-        <button class="google-btn" type="button">
-            Continue with Google
-        </button>
+        <a class="google-btn" href="{{ url_for('auth.google_login') }}">
+            <span>G</span> Continue with Google
+        </a>
 
         <div class="register-link">
             Don't have an account→

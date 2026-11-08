@@ -12,3 +12,8 @@ instance/
 
 # Local template backups
 *.backup
+
+# Private document storage
+private_uploads/
+storage/
+instance/documents/

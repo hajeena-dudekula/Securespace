@@ -3,10 +3,10 @@ from sqlalchemy import or_, cast, String
 from flask_login import LoginManager, login_required, current_user
 from flask_wtf.csrf import CSRFProtect
 
-from extensions import db, limiter
+from config import Config
+from extensions import db, limiter, oauth
 
 csrf = CSRFProtect()
-from config import Config
 from models.user import User
 from models.document import Document
 from models.permission import DocumentPermission
@@ -20,7 +20,6 @@ def create_app(test_config=None):
     app = Flask(__name__)
 
     app.config.from_object(Config)
-    app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024
 
     if test_config:
         app.config.update(test_config)
@@ -28,6 +27,15 @@ def create_app(test_config=None):
     db.init_app(app)
     limiter.init_app(app)
     csrf.init_app(app)
+
+    oauth.init_app(app)
+    oauth.register(
+        name="google",
+        client_id=app.config.get("GOOGLE_CLIENT_ID"),
+        client_secret=app.config.get("GOOGLE_CLIENT_SECRET"),
+        server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+        client_kwargs={"scope": "openid email profile"}
+    )
 
     login_manager = LoginManager()
     login_manager.login_view = "auth.login"
@@ -124,3 +132,6 @@ if __name__ == "__main__":
 
 from models.permission import DocumentPermission
 from models.audit_log import AuditLog
+
+
+

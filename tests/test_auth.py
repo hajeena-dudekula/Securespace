@@ -181,3 +181,158 @@ def test_registration_accepts_strong_password(client, app):
         account = User.query.filter_by(username="stronguser").first()
         assert account is not None
         assert account.password != "SecurePass123!@"
+
+def test_login_remember_me_sets_persistent_cookie(client):
+    client.post(
+        "/register",
+        data={
+            "username": "rememberuser",
+            "email": "remember@test.local",
+            "password": "RememberPass123!",
+            "role": "viewer"
+        }
+    )
+
+    response = client.post(
+        "/login",
+        data={
+            "username": "rememberuser",
+            "password": "RememberPass123!",
+            "remember": "on"
+        }
+    )
+
+    cookies = response.headers.getlist("Set-Cookie")
+    remember_cookie = next(
+        (cookie for cookie in cookies if cookie.startswith("remember_token=")),
+        None
+    )
+
+    assert response.status_code == 302
+    assert remember_cookie is not None
+    assert "Expires=" in remember_cookie
+
+
+def test_login_without_remember_me_uses_session_cookie_only(client):
+    client.post(
+        "/register",
+        data={
+            "username": "sessionuser",
+            "email": "session@test.local",
+            "password": "SessionPass123!",
+            "role": "viewer"
+        }
+    )
+
+    response = client.post(
+        "/login",
+        data={
+            "username": "sessionuser",
+            "password": "SessionPass123!"
+        }
+    )
+
+    cookies = response.headers.getlist("Set-Cookie")
+    remember_cookie = [
+        cookie for cookie in cookies
+        if cookie.startswith("remember_token=")
+    ]
+
+    assert response.status_code == 302
+    assert not remember_cookie
+
+def test_forgot_password_shows_same_message_for_unknown_email(client):
+    response = client.post(
+        "/forgot-password",
+        data={"email": "unknown@test.local"},
+        follow_redirects=True
+    )
+
+    assert response.status_code == 200
+    assert b"If an account exists" in response.data
+
+
+def test_password_reset_updates_password_and_invalidates_old_token(client, app):
+    from models.user import User
+    from extensions import db
+    from routes.auth import get_reset_serializer
+    from werkzeug.security import check_password_hash
+
+    client.post(
+        "/register",
+        data={
+            "username": "resetuser",
+            "email": "reset@test.local",
+            "password": "OriginalPass123!",
+            "role": "viewer"
+        }
+    )
+
+    with app.app_context():
+        account = User.query.filter_by(username="resetuser").first()
+        token = get_reset_serializer().dumps({
+            "user_id": account.id,
+            "password_hash": account.password
+        })
+
+    response = client.post(
+        f"/reset-password/{token}",
+        data={"password": "NewSecurePass123!"},
+        follow_redirects=True
+    )
+
+    assert response.status_code == 200
+    assert b"Password reset successful" in response.data
+
+    with app.app_context():
+        account = User.query.filter_by(username="resetuser").first()
+        assert check_password_hash(account.password, "NewSecurePass123!")
+
+    old_token_response = client.get(f"/reset-password/{token}")
+    assert old_token_response.status_code == 302
+    assert "/forgot-password" in old_token_response.location
+
+
+def test_password_reset_rejects_invalid_token(client):
+    response = client.get("/reset-password/invalid-token")
+
+    assert response.status_code == 302
+    assert "/forgot-password" in response.location
+
+
+def test_password_reset_rejects_weak_new_password(client, app):
+    from models.user import User
+    from extensions import db
+    from routes.auth import get_reset_serializer
+
+    client.post(
+        "/register",
+        data={
+            "username": "weakreset",
+            "email": "weakreset@test.local",
+            "password": "OriginalPass123!",
+            "role": "viewer"
+        }
+    )
+
+    with app.app_context():
+        account = User.query.filter_by(username="weakreset").first()
+        original_hash = account.password
+        token = get_reset_serializer().dumps({
+            "user_id": account.id,
+            "password_hash": account.password
+        })
+
+    response = client.post(
+        f"/reset-password/{token}",
+        data={"password": "weak"},
+        follow_redirects=True
+    )
+
+    assert response.status_code == 200
+    assert b"at least 8 characters" in response.data
+
+    with app.app_context():
+        account = User.query.filter_by(username="weakreset").first()
+        assert account.password == original_hash
+
