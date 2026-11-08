@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SecureSpace | My Documents</title>
+<title>SecureSpace | {{ "Received Files" if view == "received" else "My Documents" if view == "mine" else "All Documents" }}</title>
 
 <style>
 * {
@@ -435,8 +435,8 @@ body {
 
     <section class="hero">
         <div>
-            <h1>My Documents</h1>
-            <p>Your secure document workspace. Manage and access your files in one place.</p>
+            <h1>{{ "Received Files" if view == "received" else "My Documents" if view == "mine" else "All Documents" }}</h1>
+            <p>{% if view == "received" %}Documents shared with you by other users.{% elif view == "mine" %}Manage the documents you uploaded to your secure workspace.{% else %}Your secure document workspace. Manage and access your files in one place.{% endif %}</p>
         </div>
 
         {% if current_user.role in ["owner", "admin"] %}
@@ -455,9 +455,10 @@ body {
     </div>
 
     <section class="toolbar">
-        <h2>Find Your Documents</h2>
+        <h2>{{ "Find Received Files" if view == "received" else "Find Your Documents" if view == "mine" else "Find Documents" }}</h2>
 
         <form class="search-form" method="GET">
+            <input type="hidden" name="view" value="{{ view }}">
             <input
                 type="text"
                 name="search"
@@ -499,7 +500,7 @@ body {
     </section>
 
     <div class="section-heading">
-        <h2>Your Files</h2>
+        <h2>{{ "Received Files" if view == "received" else "Your Files" if view == "mine" else "All Documents" }}</h2>
         <span class="document-count">{{ files|length }} document(s)</span>
     </div>
 
@@ -666,8 +667,8 @@ body {
                     </svg>
                 </div>
 
-                <h3>No documents found</h3>
-                <p>Upload your first document or try a different search.</p>
+                <h3>{% if view == "received" %}No received files found{% else %}No documents found{% endif %}</h3>
+                <p>{% if view == "received" %}Files shared with you will appear here.{% elif view == "mine" %}Upload your first document or try a different search.{% else %}Try a different search or filter.{% endif %}</p>
 
                 {% if current_user.role in ["owner", "admin"] %}
         <a class="upload-link" href="{{ url_for('documents.upload_document') }}">

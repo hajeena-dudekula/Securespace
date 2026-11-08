@@ -1,4 +1,5 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, request
+from sqlalchemy import or_, cast, String
 from flask_login import LoginManager, login_required, current_user
 from flask_wtf.csrf import CSRFProtect
 
@@ -52,6 +53,14 @@ def create_app(test_config=None):
             role=current_user.role
         )
 
+    @app.route("/profile")
+    @login_required
+    def profile():
+        return render_template(
+            "profile.html",
+            user=current_user
+        )
+
     @app.route("/admin/activity")
     @login_required
     def admin_activity():
@@ -59,13 +68,28 @@ def create_app(test_config=None):
         if current_user.role != "admin":
             return "Access denied", 403
 
-        activities = AuditLog.query.order_by(
+        search = request.args.get("q", "").strip()
+
+        query = AuditLog.query
+
+        if search:
+            term = f"%{search}%"
+            query = query.filter(or_(
+                AuditLog.action.ilike(term),
+                AuditLog.details.ilike(term),
+                AuditLog.ip_address.ilike(term),
+                cast(AuditLog.actor_id, String).ilike(term),
+                cast(AuditLog.document_id, String).ilike(term)
+            ))
+
+        activities = query.order_by(
             AuditLog.created_at.desc()
         ).limit(100).all()
 
         return render_template(
             "admin/activity.html",
-            activities=activities
+            activities=activities,
+            search=search
         )
 
     @app.route("/activity/history")

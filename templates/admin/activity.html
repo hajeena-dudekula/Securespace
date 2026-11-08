@@ -111,7 +111,25 @@ th {
     <section class="heading">
         <h1>Activity Dashboard</h1>
         <p>Monitor recent document and permission activities.</p>
-        <p>Showing the latest 100 records.</p>
+        <p>Showing the latest 100 records. Search to find older records too.</p>
+
+        <form method="GET" action="{{ url_for('admin_activity') }}" style="margin-top:22px; display:flex; gap:10px; flex-wrap:wrap;">
+            <input
+                type="search"
+                name="q"
+                value="{{ search or '' }}"
+                placeholder="Search action, details, actor ID, document ID or IP..."
+                style="flex:1; min-width:220px; padding:13px 16px; border:1px solid #ffffff66; border-radius:10px; font-size:14px; outline:none;"
+            >
+            <button type="submit" style="padding:13px 24px; border:0; border-radius:10px; background:white; color:#5426c7; font-weight:700; cursor:pointer;">
+                Search
+            </button>
+            {% if search %}
+            <a href="{{ url_for('admin_activity') }}" style="padding:13px 20px; border-radius:10px; background:#ffffff22; color:white; text-decoration:none;">
+                Clear
+            </a>
+            {% endif %}
+        </form>
     </section>
 
     <section class="table-card">

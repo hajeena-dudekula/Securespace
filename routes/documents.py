@@ -9,6 +9,7 @@ from datetime import date, datetime, timezone, timedelta
 
 
 from flask import (
+    abort,
     Blueprint,
     render_template,
     request,
@@ -64,7 +65,9 @@ MAX_FILE_SIZES = {
 
 def get_document_access(document_id):
 
-    document = Document.query.get_or_404(document_id)
+    document = db.session.get(Document, document_id)
+    if document is None:
+        abort(404)
 
     if current_user.role == "admin":
         return document, "edit"
@@ -219,7 +222,7 @@ def validate_file_content(file_path, extension):
                 )
 
         if extension == "txt":
-            if b"\\x00" in header:
+            if b"\x00" in header:
                 return False
 
             with open(file_path, "rb") as uploaded_file:
@@ -242,9 +245,30 @@ def document_list():
     owner = request.args.get("owner", "").strip()
     date_from = request.args.get("date_from", "").strip()
     date_to = request.args.get("date_to", "").strip()
+    view = request.args.get("view", "all").strip().lower()
 
-    if current_user.role == "admin":
+    if view not in ("all", "mine", "received"):
+        view = "all"
+
+    if view == "mine":
+        query = Document.query.filter(
+            Document.user_id == current_user.id
+        )
+        owner = ""
+
+    elif view == "received":
+        query = Document.query.join(
+            DocumentPermission,
+            Document.id == DocumentPermission.document_id
+        ).filter(
+            DocumentPermission.user_id == current_user.id,
+            Document.user_id != current_user.id
+        ).distinct()
+        owner = ""
+
+    elif current_user.role == "admin":
         query = Document.query
+
     else:
         query = Document.query.outerjoin(
             DocumentPermission,
@@ -340,6 +364,7 @@ def document_list():
         owner=owner,
         date_from=date_from,
         date_to=date_to,
+        view=view,
         display_dates=display_dates,
         access_levels=access_levels
     )
@@ -782,4 +807,3 @@ def delete_document(document_id):
         flash("Document deletion failed.", "error")
 
     return redirect(url_for("documents.document_list"))
-

@@ -266,11 +266,22 @@ a {
             <div class="input-group">
                 <input
                     type="password"
+                    id="register-password"
                     name="password"
                     placeholder="Create a password"
                     minlength="8"
+                    maxlength="128"
+                    autocomplete="new-password"
                     required
                 >
+                <div id="password-rules" style="font-size:12px; line-height:1.9; margin:10px 2px 4px; color:#aeb9c9;">
+                    <div data-rule="length">? 8?128 characters</div>
+                    <div data-rule="upper">? One uppercase letter (A?Z)</div>
+                    <div data-rule="lower">? One lowercase letter (a?z)</div>
+                    <div data-rule="number">? One number (0?9)</div>
+                    <div data-rule="special">? One special character (!@#$...)</div>
+                    <div data-rule="common">? Avoid common passwords</div>
+                </div>
             </div>
 
             <div class="input-group">
@@ -294,6 +305,62 @@ a {
     </section>
 
 </div>
+
+
+<script>
+(function () {
+    const password = document.getElementById("register-password");
+    const rulesBox = document.getElementById("password-rules");
+    const form = password ? password.closest("form") : null;
+
+    if (!password || !rulesBox || !form) return;
+
+    const commonPasswords = new Set([
+        "password", "password123", "password1234",
+        "12345678", "123456789", "qwerty123",
+        "admin123", "welcome123", "letmein123"
+    ]);
+
+    function validatePassword() {
+        const value = password.value;
+        const checks = {
+            length: value.length >= 8 && value.length <= 128,
+            upper: /[A-Z]/.test(value),
+            lower: /[a-z]/.test(value),
+            number: /[0-9]/.test(value),
+            special: /[^A-Za-z0-9]/.test(value),
+            common: !commonPasswords.has(value.toLowerCase())
+        };
+
+        Object.entries(checks).forEach(([rule, passed]) => {
+            const item = rulesBox.querySelector('[data-rule="' + rule + '"]');
+            if (item) {
+                item.textContent = (passed ? "? " : "? ") +
+                    item.textContent.replace(/^[??] /, "");
+                item.style.color = passed ? "#20b77a" : "#aeb9c9";
+            }
+        });
+
+        return Object.values(checks).every(Boolean);
+    }
+
+    password.addEventListener("input", validatePassword);
+
+    form.addEventListener("submit", function (event) {
+        if (!validatePassword()) {
+            event.preventDefault();
+            password.setCustomValidity("Please satisfy all password requirements.");
+            password.reportValidity();
+        } else {
+            password.setCustomValidity("");
+        }
+    });
+
+    password.addEventListener("input", function () {
+        password.setCustomValidity("");
+    });
+})();
+</script>
 
 </body>
 </html>

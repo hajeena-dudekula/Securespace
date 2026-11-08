@@ -124,3 +124,60 @@ def test_registration_rejects_admin_role(client, app):
     with app.app_context():
         account = User.query.filter_by(username="fakeadmin").first()
         assert account is None
+
+
+
+def test_registration_rejects_weak_passwords(client, app):
+    from models.user import User
+
+    weak_passwords = [
+        "short1!",
+        "alllowercase123!",
+        "ALLUPPERCASE123!",
+        "NoNumbers!!",
+        "NoSpecial123",
+        "password123",
+        "A" * 129
+    ]
+
+    for index, password in enumerate(weak_passwords):
+        response = client.post(
+            "/register",
+            data={
+                "username": f"weakuser{index}",
+                "email": f"weakuser{index}@test.local",
+                "password": password,
+                "role": "viewer"
+            },
+            follow_redirects=True
+        )
+
+        assert response.status_code == 200
+
+        with app.app_context():
+            account = User.query.filter_by(
+                username=f"weakuser{index}"
+            ).first()
+            assert account is None
+
+
+def test_registration_accepts_strong_password(client, app):
+    from models.user import User
+
+    response = client.post(
+        "/register",
+        data={
+            "username": "stronguser",
+            "email": "stronguser@test.local",
+            "password": "SecurePass123!@",
+            "role": "viewer"
+        },
+        follow_redirects=True
+    )
+
+    assert response.status_code == 200
+
+    with app.app_context():
+        account = User.query.filter_by(username="stronguser").first()
+        assert account is not None
+        assert account.password != "SecurePass123!@"

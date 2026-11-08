@@ -570,12 +570,20 @@ a {
             Dashboard
         </a>
 
-        <a href="{{ url_for('documents.document_list') }}" class="nav-item">
+        <a href="{{ url_for('documents.document_list', view='mine') }}" class="nav-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                 <path d="M14 2v6h6M8 13h8M8 17h6"/>
             </svg>
             My Documents
+        </a>
+
+        <a href="{{ url_for('documents.document_list', view='received') }}" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M4 4h16v16H4z"/>
+                <path d="M4 13h4l2 3h4l2-3h4M12 4v9m-3-3 3 3 3-3"/>
+            </svg>
+            Received Files
         </a>
 
         {% if role in ["owner", "admin"] %}
@@ -629,13 +637,13 @@ a {
     <header class="topbar">
         <div class="breadcrumb">Workspace &nbsp;/&nbsp; <span>Overview</span></div>
 
-        <div class="profile">
+        <a href="{{ url_for('profile') }}" class="profile" style="text-decoration:none;color:inherit;cursor:pointer;" aria-label="Open my profile">
             <div class="avatar">{{ username[:1]|upper }}</div>
             <div>
                 <strong>{{ username }}</strong>
                 <small>{{ role }}</small>
             </div>
-        </div>
+        </a>
     </header>
 
     <section class="heading">
@@ -685,7 +693,7 @@ a {
         </a>
         {% endif %}
 
-        <a href="{{ url_for('documents.document_list') }}" class="card">
+        <a href="{{ url_for('documents.document_list', view='mine') }}" class="card">
             <div class="card-top">
                 <div class="card-icon mint">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -697,6 +705,20 @@ a {
             </div>
             <h3>My Documents</h3>
             <p>Browse, preview, download and manage documents you can access.</p>
+        </a>
+
+        <a href="{{ url_for('documents.document_list', view='received') }}" class="card">
+            <div class="card-top">
+                <div class="card-icon lime">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M4 4h16v16H4z"/>
+                        <path d="M4 13h4l2 3h4l2-3h4M12 4v9m-3-3 3 3 3-3"/>
+                    </svg>
+                </div>
+                <span class="card-arrow">?</span>
+            </div>
+            <h3>Received Files</h3>
+            <p>View documents other users have securely shared with you.</p>
         </a>
 
 {% if role == "owner" %}

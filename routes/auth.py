@@ -1,11 +1,44 @@
 ﻿from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
+import re
 
 from extensions import db, limiter
 from models.user import User
 
 auth = Blueprint("auth", __name__)
+
+
+COMMON_PASSWORDS = {
+    "password", "password123", "password1234",
+    "12345678", "123456789", "qwerty123",
+    "admin123", "welcome123", "letmein123"
+}
+
+
+def validate_password_strength(password):
+    if len(password) < 8:
+        return "Password must contain at least 8 characters."
+
+    if len(password) > 128:
+        return "Password must not exceed 128 characters."
+
+    if password.casefold() in COMMON_PASSWORDS:
+        return "This password is too common. Choose a stronger password."
+
+    if not re.search(r"[A-Z]", password):
+        return "Add at least one uppercase letter."
+
+    if not re.search(r"[a-z]", password):
+        return "Add at least one lowercase letter."
+
+    if not re.search(r"[0-9]", password):
+        return "Add at least one number."
+
+    if not re.search(r"[^A-Za-z0-9]", password):
+        return "Add at least one special character."
+
+    return None
 
 
 @auth.route("/register", methods=["GET", "POST"])
@@ -20,6 +53,11 @@ def register():
 
         if not username or not email or not password:
             flash("Please fill all required fields.")
+            return redirect(url_for("auth.register"))
+
+        password_error = validate_password_strength(password)
+        if password_error:
+            flash(password_error)
             return redirect(url_for("auth.register"))
 
         if role not in {"owner", "viewer"}:

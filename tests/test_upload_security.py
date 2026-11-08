@@ -61,7 +61,7 @@ def create_valid_docx():
     ("png", b"\x89PNG\r\n\x1a\n" + b"test", b"not a PNG"),
     ("jpg", b"\xff\xd8\xff" + b"test", b"not a JPEG"),
     ("docx", create_valid_docx(), b"not a DOCX"),
-    ("txt", b"SecureSpace test document", b"\\x00binary"),
+    ("txt", b"SecureSpace test document", b"\x00binary"),
 ])
 def test_content_validation_for_supported_file_types(
     tmp_path, extension, valid_content, invalid_content
