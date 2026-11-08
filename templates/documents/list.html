@@ -439,9 +439,11 @@ body {
             <p>Your secure document workspace. Manage and access your files in one place.</p>
         </div>
 
+        {% if current_user.role in ["owner", "admin"] %}
         <a class="upload-link" href="{{ url_for('documents.upload_document') }}">
             Upload Document
         </a>
+        {% endif %}
     </section>
 
     <div class="messages">
@@ -667,9 +669,11 @@ body {
                 <h3>No documents found</h3>
                 <p>Upload your first document or try a different search.</p>
 
-                <a class="upload-link" href="{{ url_for('documents.upload_document') }}">
+                {% if current_user.role in ["owner", "admin"] %}
+        <a class="upload-link" href="{{ url_for('documents.upload_document') }}">
                     Upload Your First Document
                 </a>
+                {% endif %}
             </div>
 
         {% endif %}

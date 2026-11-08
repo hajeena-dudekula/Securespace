@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -578,6 +578,7 @@ a {
             My Documents
         </a>
 
+        {% if role in ["owner", "admin"] %}
         <a href="{{ url_for('documents.upload_document') }}" class="nav-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <path d="M12 16V4m-5 5 5-5 5 5"/>
@@ -585,6 +586,7 @@ a {
             </svg>
             Upload Files
         </a>
+        {% endif %}
 
         <a href="{{ url_for('user_activity_history') }}" class="nav-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -667,6 +669,7 @@ a {
 
     <section class="cards">
 
+        {% if role in ["owner", "admin"] %}
         <a href="{{ url_for('documents.upload_document') }}" class="card">
             <div class="card-top">
                 <div class="card-icon orange">
@@ -680,6 +683,7 @@ a {
             <h3>Upload Documents</h3>
             <p>Add a new file to your private workspace with secure storage and validation.</p>
         </a>
+        {% endif %}
 
         <a href="{{ url_for('documents.document_list') }}" class="card">
             <div class="card-top">
@@ -695,6 +699,7 @@ a {
             <p>Browse, preview, download and manage documents you can access.</p>
         </a>
 
+{% if role == "owner" %}
         <a href="{{ url_for('documents.document_list') }}" class="card">
             <div class="card-top">
                 <div class="card-icon lime">
@@ -708,6 +713,7 @@ a {
             <h3>Access Management</h3>
             <p>Manage document sharing and permissions from your document workspace.</p>
         </a>
+        {% endif %}
 
         <div class="card">
             <div class="card-top">
