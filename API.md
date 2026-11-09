@@ -1,22 +1,23 @@
-﻿# SecureSpace - API and Route Documentation
+# SecureSpace - API and Route Documentation
 
 ## 1. Overview
 
-SecureSpace is a Flask-based secure document-sharing application.
+SecureSpace is a Flask-based secure document-sharing platform developed for the Snovasys Fresher Hiring Challenge 2026.
 
-The current implementation uses server-rendered HTML pages and form-based routes. It does not expose a separate REST API or JSON-based public API.
+The application uses server-rendered HTML pages and form-based routes. It does not expose a separate public REST or JSON API.
 
-This document describes the application's available routes, HTTP methods, authentication requirements, and authorization rules.
+This document describes the application's routes, HTTP methods, authentication requirements, authorization rules, and security behavior.
 
 ## 2. Authentication
 
-The application uses Flask-Login for session-based authentication.
+SecureSpace uses Flask-Login for session-based authentication.
 
-- Users must log in before accessing protected document operations.
+- Users must authenticate before accessing protected document operations.
 - Passwords are stored using Werkzeug password hashing.
 - Newly registered users receive the Viewer role by default.
-- Login POST requests are limited to 5 attempts per minute.
+- Login POST requests are rate-limited to 5 attempts per minute.
 - CSRF protection is enabled for application forms.
+- User sessions are managed through Flask-Login.
 
 ## 3. Route Reference
 
@@ -26,19 +27,19 @@ The application uses Flask-Login for session-based authentication.
 |---|---|---|---|
 | GET, POST | `/register` | Public | Display registration form and create an account |
 | GET, POST | `/login` | Public | Display login form and authenticate a user |
-| POST | `/logout` | Public (session optional) | End the current user session if one exists |
+| POST | `/logout` | Session optional | End the current user session |
 
-Registration assigns the default Viewer role.
+New registrations receive the default Viewer role.
 
 ### 3.2 General Routes
 
 | Method | Endpoint | Authentication | Authorization | Description |
 |---|---|---|---|---|
 | GET | `/` | Public | None | Redirect to login |
-| GET | `/dashboard` | Required | Authenticated users | Display user dashboard |
-| GET | `/admin/activity` | Required | Administrator only | Display the latest 100 audit activities |
+| GET | `/dashboard` | Required | Authenticated users | Display the appropriate dashboard |
+| GET | `/admin/activity` | Required | Administrator only | Display recent audit activities |
 
-Non-administrator users receive HTTP 403 when accessing the administrator activity page.
+Unauthorized access to administrator-only pages is rejected.
 
 ### 3.3 Document Routes
 
@@ -46,38 +47,47 @@ All document routes use the `/documents` URL prefix.
 
 | Method | Endpoint | Authentication | Authorization | Description |
 |---|---|---|---|---|
-| GET | `/documents/` | Required | Admin sees all documents; other users see owned or shared documents | List, search, and filter documents |
+| GET | `/documents/` | Required | Admin sees all; other users see owned or shared documents | List, search, and filter documents |
 | GET, POST | `/documents/upload` | Required | Authenticated users | Display upload form and upload documents |
 | GET | `/documents/preview/<document_id>` | Required | Owner or user with read/edit access | Preview supported documents |
 | GET | `/documents/download/<document_id>` | Required | Owner or user with read/edit access | Download a document |
 | POST | `/documents/suggest-permission/<document_id>` | Required | Document owner only | Generate a permission recommendation |
-| POST | `/documents/share/<document_id>` | Required | Document owner only | Grant or update read/edit access |
-| POST | `/documents/revoke/<document_id>` | Required | Document owner only | Revoke a user's document permission |
+| POST | `/documents/share/<document_id>` | Required | Document owner only | Grant or update document access |
+| POST | `/documents/revoke/<document_id>` | Required | Document owner only | Revoke document access |
 | POST | `/documents/edit/<document_id>` | Required | Owner or user with edit permission | Update document category |
 | POST | `/documents/delete/<document_id>` | Required | Document owner or administrator | Delete a document |
+
+### 3.4 Activity and History
+
+The application provides activity-history views to help users review relevant document and account activities. Administrator activity access is restricted to the Administrator role.
 
 ## 4. Authorization Rules
 
 ### Administrator
+
 - Can view all documents in the document listing.
-- Can access the administrator activity page.
+- Can access administrator activity records.
 - Can delete documents.
-- Does not automatically receive document preview or download permission unless the access-check logic grants it.
+- Does not automatically receive document preview or download permission unless the document access-check logic grants it.
 
 ### Document Owner
+
 - Can view and manage owned documents.
 - Can upload documents.
-- Can share and revoke document permissions.
+- Can share documents and revoke permissions.
 - Can update document categories and delete owned documents.
 - Can use the Permission Advisor.
+- Retains control over sharing decisions.
 
 ### Viewer
+
 - Can view documents explicitly shared with them.
 - Can preview and download documents with read or edit permission.
 - Cannot share, revoke, or delete another user's documents.
 
 ### Document-level Editor Permission
-- Receives the access granted through a document-level edit permission.
+
+- Receives access through an explicit document-level edit permission.
 - Can preview and download the shared document.
 - Can update its category.
 - Cannot automatically share or delete the document.
@@ -95,7 +105,16 @@ The upload process includes:
 
 Supported extensions include PDF, DOCX, TXT, PNG, JPG, and JPEG.
 
-## 6. Audit Logging
+## 6. Document Sharing and Revocation
+
+- Document owners select users and access levels when sharing.
+- Permissions are enforced on the server.
+- Owners can revoke previously granted access.
+- Sharing timestamps are associated with permission grants.
+- Re-sharing updates the permission grant timestamp.
+- Users without valid access are denied document operations.
+
+## 7. Audit Logging
 
 Important document and permission operations generate audit records.
 
@@ -109,21 +128,24 @@ Recorded activities include:
 - Permission grant.
 - Permission revocation.
 - Permission recommendation generation.
-- Key denied document-access attempts.
+- Denied document-access attempts.
 
 Audit records include relevant actor, document, action, timestamp, IP address, and details fields.
 
-HMAC-based integrity hashes are used to detect unauthorized changes to audit records.
+HMAC-based integrity hashes help detect unauthorized modifications to audit records.
 
-## 7. Permission Advisor
+## 8. Permission Advisor
 
 The Permission Advisor is a rule-based recommendation service.
 
 It considers document category, sharing purpose, and existing permission context to suggest read or edit access.
 
-Recommendations do not grant access automatically. The document owner must explicitly approve access through the sharing operation.
+- Recommendations are advisory only.
+- The owner reviews the suggested access.
+- The owner must explicitly approve sharing.
+- Permissions are never granted automatically by the advisor.
 
-## 8. Security Controls
+## 9. Security Controls
 
 - Session-based authentication.
 - Server-side document authorization.
@@ -136,9 +158,7 @@ Recommendations do not grant access automatically. The document owner must expli
 - Private file storage.
 - HMAC-based audit integrity verification.
 
-## 9. HTTP Status Codes
-
-The application uses standard HTTP status codes where applicable:
+## 10. HTTP Status Codes
 
 | Status | Meaning |
 |---|---|
@@ -148,13 +168,39 @@ The application uses standard HTTP status codes where applicable:
 | 404 | Resource not found |
 | 429 | Rate limit exceeded |
 
-Some form-based operations communicate results through redirects and flash messages rather than JSON responses.
+Form-based operations commonly communicate results through redirects and flash messages rather than JSON responses.
 
-## 10. Important Implementation Notes
+## 11. Deployment
+
+- Hosting platform: Render
+- Application server: Gunicorn
+- Runtime: Python
+- Build command: `pip install -r requirements.txt`
+- Start command: `gunicorn run:app`
+- Source repository: https://github.com/hajeena-dudekula/Securespace
+- Deployment URL: https://securespace-new.onrender.com
+
+Production configuration uses environment variables for application secrets, database connectivity, rate-limit storage, and private document storage.
+
+## 12. Testing
+
+Automated tests are executed using Pytest.
+
+Latest locally verified result:
+
+    78 passed
+    0 failed
+
+The test suite covers authentication and application functionality, including document and permission-related behavior.
+
+## 13. Implementation Notes
 
 - This documentation describes the active root-level Flask application and its registered blueprints.
-- The application currently uses server-rendered pages and form submissions.
+- The application uses server-rendered pages and form submissions.
 - There is no separate REST API authentication mechanism.
-- Production deployment and external infrastructure configuration remain pending.
+- Document authorization is enforced on the server.
+- Permission recommendations require explicit owner approval.
 
+---
 
+**SecureSpace - Secure Documents. Controlled Access. Verifiable Activity.**

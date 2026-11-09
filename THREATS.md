@@ -1,4 +1,4 @@
-﻿# SecureSpace – Security Threat Analysis
+# SecureSpace – Security Threat Analysis
 
 ## 1. Project Information
 
@@ -6,7 +6,7 @@
 - **Challenge:** Snovasys Fresher Hiring Challenge 2026
 - **Application:** Flask-based document-sharing application
 - **Database:** SQLite (current development configuration)
-- **Review date:** 2026-11-06
+- **Review date:** 2026-11-09
 
 ## 2. Purpose
 
@@ -171,9 +171,9 @@ A security control is not considered fully verified merely because its code exis
 
 **Remaining limitations:**
 - Production requires an accessible Redis service for shared rate-limit storage.
-- The Python Redis dependency is installed, but a live Redis service has not yet been connected.
+- A Render Redis service has been provisioned. Application connectivity and shared rate-limit behavior require production verification.
 
-**Status:** Login rate limiting implemented and tested; production Redis configuration pending.
+**Status:** Login rate limiting implemented and tested; production Redis infrastructure provisioned, with application connectivity verification remaining.
 
 ### Threat 9 – Weak Password Storage
 
@@ -205,10 +205,10 @@ A security control is not considered fully verified merely because its code exis
 - Gunicorn and Redis dependencies are listed in requirements.txt.
 
 **Remaining limitations:**
-- A production hosting provider has not yet been configured.
-- Production database provisioning and migration strategy remain pending.
+- A new Render web service has been created and configured for deployment.
+- A Render PostgreSQL database has been provisioned; application connectivity and production data migration require verification.
 - Persistent private file storage must be configured and tested.
-- A real Redis service must be connected.
+- A Render Redis service has been provisioned; application connectivity requires verification.
 - HTTPS and live deployment behavior must be verified.
 - Production secrets must be stored securely outside the repository.
 
@@ -231,13 +231,13 @@ The current automated test suite includes coverage for:
 11. Login rate limiting.
 12. CSRF protection.
 
-**Latest full test result (2026-11-06):**
+**Latest full test result (2026-11-09):**
 
-- Passed: 52
+- Passed: 78
 - Failed: 0
-- Warnings: 12
+- Warnings: 1
 
-The 12 warnings relate to SQLAlchemy Query.get() deprecation and are not test failures.
+The single warning relates to Flask-Login using the deprecated datetime.utcnow() method. It is not a test failure.
 
 Passing automated tests do not establish that every possible attack has been prevented. Production testing and additional security review remain necessary.
 
@@ -265,9 +265,9 @@ Passing automated tests do not establish that every possible attack has been pre
 | Malware scanning | Not implemented |
 | External immutable audit storage | Not implemented |
 | Production secret validation | Implemented |
-| Production Redis service | Not configured |
-| Production database and persistent storage | Pending |
-| Live HTTPS deployment verification | Pending |
+| Production Redis service | Provisioned; connectivity verification required |
+| Production database | Provisioned; connectivity verification required |
+| Live HTTPS deployment verification | Requires final operational verification |
 
 ## 6. Accepted Security Gaps and Limitations
 
@@ -317,9 +317,8 @@ Implemented document-level permissions, sharing, revocation, owner and administr
 - Added production secret validation.
 - Updated the application entrypoint.
 - Added production Redis enforcement.
-- Ran the full automated test suite: 52 passed, 0 failed.
+- Historical test result at that review: 52 passed, 0 failed. This was superseded by the latest full test result: 78 passed, 0 failed.
 
 ### Next Review
 
-Complete production Redis configuration, database and persistent storage setup, live HTTPS deployment, malware-scanning evaluation, and external audit-storage evaluation.
-
+Production validation areas: Redis connectivity, database connectivity and migration, persistent storage, live HTTPS behavior, malware-scanning evaluation, and external audit-storage evaluation.

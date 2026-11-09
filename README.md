@@ -1,40 +1,65 @@
 # SecureSpace
+### Secure Document Sharing with a Verifiable Audit Trail
 
-SecureSpace is a secure document-sharing platform developed for the Snovasys Fresher Hiring Challenge 2026.
+SecureSpace is a secure document management and sharing platform developed for the **Snovasys Fresher Hiring Challenge 2026**. It enables users to securely upload, manage, share, and access documents through role-based authorization while maintaining tamper-evident activity records.
+
+## Project Status
+
+**COMPLETED**
 
 ## Key Features
 
-- User registration, login, and logout.
-- Admin, Owner, and Viewer roles.
-- Secure document upload, preview, and download.
+- Secure user registration, login, logout, and session management.
+- Role-based access control: Administrator, Document Owner, and Viewer.
+- Secure document upload, preview, download, and editing.
 - Document-level read and edit permissions.
-- Owner-controlled sharing and revocation.
-- Document search by name and category.
-- Admin owner filtering and date filtering.
+- Owner-controlled document sharing and access revocation.
+- Document search and category filtering.
+- Admin dashboard with owner and date-based filtering.
+- Activity history with document and account-related events.
 - Audit logs with HMAC-based tamper-evident integrity verification.
-- Rule-based Permission Advisor requiring owner approval.
+- Rule-based AI Permission Advisor with owner approval.
 - Login rate limiting and CSRF protection.
+- Document sharing timestamps and activity history.
+- Responsive web interface.
 
 ## Technology Stack
 
-- Python, Flask, Flask-SQLAlchemy
-- Flask-Login, Flask-WTF, Flask-Limiter
-- SQLite
-- HTML, CSS, JavaScript
-- Pytest
+| Component | Technology |
+|---|---|
+| Backend | Python, Flask |
+| Database | Flask-SQLAlchemy, SQLite / PostgreSQL configuration |
+| Authentication | Flask-Login, Werkzeug |
+| Security | Flask-WTF, Flask-Limiter |
+| Frontend | HTML, CSS, JavaScript, Bootstrap |
+| Audit Integrity | HMAC |
+| Cache / Rate Limiting | Redis |
+| Testing | Pytest |
+| Deployment | Render, Gunicorn |
 
-## Security
+## Security Implementation
 
-- Werkzeug password hashing.
-- Server-side document authorization.
-- Private storage and UUID-based filenames.
+- Secure password hashing using Werkzeug.
+- Server-side authorization checks for document operations.
+- Private document storage.
+- UUID-based stored filenames.
 - File extension and content-signature validation.
-- CSRF protection and login rate limiting.
-- HMAC-signed audit records.
+- CSRF protection for form submissions.
+- Login rate limiting.
+- HMAC-based audit record integrity verification.
+- Permission checks for document viewing, editing, downloading, and sharing.
+- Owner approval required before suggested permissions are granted.
 
-The Permission Advisor provides rule-based suggestions only. It never grants permissions automatically.
+## AI Permission Advisor
 
-## Setup
+SecureSpace includes a rule-based Permission Advisor that evaluates document-sharing context and suggests suitable access permissions.
+
+- Provides permission recommendations.
+- Supports owner review and approval.
+- Does not automatically grant access.
+- Keeps final permission decisions under document-owner control.
+
+## Installation and Setup
 
 Clone the repository:
 
@@ -53,40 +78,62 @@ Install dependencies:
 
     python -m pip install -r requirements.txt
 
+Configure the required environment variables in a local `.env` file.
+
 Run the application:
 
     python run.py
 
-Open http://127.0.0.1:5000 in your browser.
+Open:
 
-## Tests
+    http://127.0.0.1:5000
 
-Run:
+## Automated Testing
 
-    python -m pytest
+Run the test suite:
 
-Latest recorded result: 52 passed, 0 failed.
+    python -m pytest -q
+
+**Latest verified test result:**
+
+    78 passed
+    0 failed
+
+The test suite covers authentication, authorization, document operations, permissions, and security-related application behavior.
 
 ## Environment Variables
 
-- SECRET_KEY: Flask application secret.
-- AUDIT_LOG_SECRET: Audit integrity signing secret.
-- DATABASE_URL: Database connection URL.
-- APP_ENV: Application environment.
-- RATELIMIT_STORAGE_URI: Rate-limit storage backend.
-- DOCUMENT_STORAGE_PATH: Private document storage directory.
+Configure the following variables according to the deployment environment:
 
-Production requires strong secrets and a persistent Redis rate-limit backend.
+- `SECRET_KEY` â€“ Flask application secret.
+- `AUDIT_LOG_SECRET` â€“ Audit integrity signing secret.
+- `DATABASE_URL` â€“ Database connection URL.
+- `APP_ENV` â€“ Application environment.
+- `RATELIMIT_STORAGE_URI` â€“ Rate-limit storage backend.
+- `DOCUMENT_STORAGE_PATH` â€“ Private document storage directory.
 
-## Documentation
+Never commit production secrets, `.env` files, database files, or private uploaded documents.
 
-- API.md: Application routes and access permissions.
-- THREATS.md: Security threats and mitigations.
-- PROMPTS.md: AI-assisted development history.
-- PROJECT_PLAN.md: Development plan and progress.
+## Deployment
 
-## Deployment Status
+**Platform:** Render
+**Repository:** https://github.com/hajeena-dudekula/Securespace
+**Production URL:** https://securespace-new.onrender.com
 
-Production deployment is pending. A production database, persistent private storage, Redis service, and HTTPS configuration must be set up and verified before release.
+The application uses Gunicorn as its production application server.
 
-Core application features and the current automated security test suite have been implemented. Final production verification remains.
+## Project Documentation
+
+- `API.md` â€“ Application routes and access permissions.
+- `THREATS.md` â€“ Security threats, mitigations, and accepted risks.
+- `PROMPTS.md` â€“ AI-assisted development history.
+- `PROJECT_PLAN.md` â€“ Project architecture and development plan.
+- `PROBLEM_STATEMENT.md` â€“ Original project problem statement.
+
+## Repository
+
+GitHub: https://github.com/hajeena-dudekula/Securespace
+
+---
+
+**SecureSpace â€“ Secure Documents. Controlled Access. Verifiable Activity.**

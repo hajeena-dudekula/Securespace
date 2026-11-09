@@ -17,3 +17,6 @@ instance/
 private_uploads/
 storage/
 instance/documents/
+
+# Temporary test files
+pdf_editor_test.pdf
