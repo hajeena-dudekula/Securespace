@@ -2,6 +2,7 @@
 import hmac
 import json
 import os
+import shutil
 import uuid
 import zipfile
 
@@ -23,6 +24,15 @@ from flask import (
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from sqlalchemy import or_
+from docx import Document as DocxDocument
+from pypdf import PdfReader
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.utils import simpleSplit
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.enums import TA_LEFT
+from reportlab.lib.styles import ParagraphStyle
+from xml.sax.saxutils import escape
 
 from extensions import db
 from models.document import Document
@@ -352,6 +362,12 @@ def document_list():
                 user_id=current_user.id
             ).first()
 
+            if permission and permission.granted_at:
+                utc_time = permission.granted_at.replace(tzinfo=timezone.utc)
+                display_dates[item.id] = utc_time.astimezone(
+                    timezone(timedelta(hours=5, minutes=30))
+                )
+
             access_levels[item.id] = (
                 permission.permission if permission else None
             )
@@ -546,6 +562,195 @@ def download_document(document_id):
 
 
 
+
+@documents.route("/edit-content/<int:document_id>")
+@login_required
+def edit_document_content(document_id):
+
+    document, access = get_document_access(document_id)
+
+    if not document or access != "edit":
+        create_signed_audit_log(
+            actor_id=current_user.id,
+            document_id=document.id if document else None,
+            action="access_denied_content_edit",
+            details=f"Unauthorized content edit attempt for document {document_id}",
+            ip_address=request.remote_addr
+        )
+        db.session.commit()
+        return "Access denied", 403
+
+    extension = document.filename.rsplit(".", 1)[-1].lower()
+
+    if extension not in {"txt", "pdf"}:
+        flash("Content editing is supported for TXT and PDF files only.", "error")
+        return redirect(url_for("documents.document_list"))
+
+    file_path = os.path.join(
+        get_document_storage_path(),
+        document.stored_filename
+    )
+
+    if not os.path.isfile(file_path):
+        abort(404)
+
+    try:
+        if extension == "txt":
+            with open(file_path, "r", encoding="utf-8-sig") as file:
+                content = file.read()
+        else:
+            if os.path.getsize(file_path) > 10 * 1024 * 1024:
+                flash("PDF editing is limited to files up to 10 MB.", "error")
+                return redirect(url_for("documents.document_list"))
+
+            reader = PdfReader(file_path)
+
+            if reader.is_encrypted:
+                flash("Encrypted PDFs cannot be edited.", "error")
+                return redirect(url_for("documents.document_list"))
+
+            content = "\\n\\n".join(
+                page.extract_text() or ""
+                for page in reader.pages
+            )
+
+            if not content.strip():
+                flash("No extractable text was found in this PDF.", "error")
+                return redirect(url_for("documents.document_list"))
+
+    except UnicodeDecodeError:
+        flash("This TXT file cannot be opened with UTF-8 encoding.", "error")
+        return redirect(url_for("documents.document_list"))
+    except Exception:
+        flash("This PDF could not be read. It may be damaged or unsupported.", "error")
+        return redirect(url_for("documents.document_list"))
+
+    return render_template(
+        "documents/edit.html",
+        document=document,
+        content=content
+    )
+
+
+@documents.route("/save-content/<int:document_id>", methods=["POST"])
+@login_required
+def save_document_content(document_id):
+
+    document, access = get_document_access(document_id)
+
+    if not document or access != "edit":
+        create_signed_audit_log(
+            actor_id=current_user.id,
+            document_id=document.id if document else None,
+            action="access_denied_content_save",
+            details=f"Unauthorized content save attempt for document {document_id}",
+            ip_address=request.remote_addr
+        )
+        db.session.commit()
+        return "Access denied", 403
+
+    extension = document.filename.rsplit(".", 1)[-1].lower()
+
+    if extension not in {"txt", "pdf"}:
+        return "Content editing is supported for TXT and PDF files only.", 400
+
+    content = request.form.get("content", "")
+
+    max_size = MAX_FILE_SIZES["txt"] if extension == "txt" else 10 * 1024 * 1024
+
+    if len(content.encode("utf-8")) > max_size:
+        flash("Document content exceeds the editing size limit.", "error")
+        return redirect(url_for(
+            "documents.edit_document_content",
+            document_id=document.id
+        ))
+
+    file_path = os.path.join(
+        get_document_storage_path(),
+        document.stored_filename
+    )
+
+    if not os.path.isfile(file_path):
+        abort(404)
+
+    temp_path = file_path + "." + uuid.uuid4().hex + ".tmp"
+    rollback_path = file_path + "." + uuid.uuid4().hex + ".rollback"
+    backup_path = file_path + ".original.bak"
+    replaced = False
+
+    try:
+        shutil.copy2(file_path, rollback_path)
+
+        if extension == "pdf":
+            if not os.path.exists(backup_path):
+                shutil.copy2(file_path, backup_path)
+
+            styles = getSampleStyleSheet()
+            story = []
+
+            for line in content.splitlines():
+                if line.strip():
+                    safe_line = escape(line).replace("	", "    ")
+                    story.append(Paragraph(safe_line, styles["BodyText"]))
+                    story.append(Spacer(1, 5))
+                else:
+                    story.append(Spacer(1, 10))
+
+            if not story:
+                story.append(Paragraph(" ", styles["BodyText"]))
+
+            pdf = SimpleDocTemplate(
+                temp_path,
+                pagesize=A4,
+                rightMargin=50,
+                leftMargin=50,
+                topMargin=50,
+                bottomMargin=50
+            )
+            pdf.build(story)
+
+        else:
+            with open(temp_path, "w", encoding="utf-8", newline="") as file:
+                file.write(content)
+
+        os.replace(temp_path, file_path)
+        replaced = True
+
+        create_signed_audit_log(
+            actor_id=current_user.id,
+            document_id=document.id,
+            action="document_content_modified",
+            details=f"Content updated for {document.filename}",
+            ip_address=request.remote_addr
+        )
+
+        db.session.commit()
+
+        if os.path.exists(rollback_path):
+            os.remove(rollback_path)
+
+        flash("Document content updated successfully.", "success")
+
+    except Exception:
+        db.session.rollback()
+
+        if replaced and os.path.exists(rollback_path):
+            os.replace(rollback_path, file_path)
+        elif os.path.exists(rollback_path):
+            os.remove(rollback_path)
+
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+
+        flash("Document update failed. The previous file was preserved.", "error")
+
+        return redirect(url_for(
+            "documents.edit_document_content",
+            document_id=document.id
+        ))
+
+    return redirect(url_for("documents.document_list"))
+
 @documents.route("/suggest-permission/<int:document_id>", methods=["POST"])
 @login_required
 def suggest_document_permission(document_id):
@@ -652,6 +857,7 @@ def share_document(document_id):
     if permission:
         permission.permission = permission_type
         permission.granted_by = current_user.id
+        permission.granted_at = datetime.now(timezone.utc).replace(tzinfo=None)
     else:
         permission = DocumentPermission(
             document_id=document.id,
@@ -807,3 +1013,5 @@ def delete_document(document_id):
         flash("Document deletion failed.", "error")
 
     return redirect(url_for("documents.document_list"))
+
+

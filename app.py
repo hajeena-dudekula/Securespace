@@ -1,4 +1,5 @@
-from flask import Flask, render_template, redirect, url_for, request
+﻿from flask import Flask, render_template, redirect, url_for, request
+from datetime import timezone, timedelta
 from sqlalchemy import or_, cast, String
 from flask_login import LoginManager, login_required, current_user
 from flask_wtf.csrf import CSRFProtect
@@ -94,6 +95,13 @@ def create_app(test_config=None):
             AuditLog.created_at.desc()
         ).limit(100).all()
 
+        ist = timezone(timedelta(hours=5, minutes=30))
+        for activity in activities:
+            if activity.created_at:
+                activity.display_created_at = activity.created_at.replace(
+                    tzinfo=timezone.utc
+                ).astimezone(ist)
+
         return render_template(
             "admin/activity.html",
             activities=activities,
@@ -109,6 +117,13 @@ def create_app(test_config=None):
         ).order_by(
             AuditLog.created_at.desc()
         ).limit(100).all()
+
+        ist = timezone(timedelta(hours=5, minutes=30))
+        for activity in activities:
+            if activity.created_at:
+                activity.display_created_at = activity.created_at.replace(
+                    tzinfo=timezone.utc
+                ).astimezone(ist)
 
         return render_template(
             "activity/history.html",
@@ -132,6 +147,8 @@ if __name__ == "__main__":
 
 from models.permission import DocumentPermission
 from models.audit_log import AuditLog
+
+
 
 
 

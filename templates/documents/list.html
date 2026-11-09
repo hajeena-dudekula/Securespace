@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -532,14 +532,14 @@ body {
                     <div class="document-meta">
 
                         <div class="meta-item">
-                            Uploaded date
+                            {{ "Uploaded date" if current_user.role == "admin" or file.user_id == current_user.id else "Shared date" }}
                             <strong>
                                 {{ display_dates[file.id].strftime("%d %b %Y") }}
                             </strong>
                         </div>
 
                         <div class="meta-item">
-                            Upload time
+                            {{ "Upload time" if current_user.role == "admin" or file.user_id == current_user.id else "Shared time" }}
                             <strong>
                                 {{ display_dates[file.id].strftime("%I:%M:%S %p") }}
                             </strong>
@@ -613,6 +613,10 @@ body {
                         {% endif %}
 
                         {% if access_levels[file.id] == "edit" %}
+
+                            {% if file.filename.rsplit(".", 1)[-1].lower() in ["txt", "pdf"] %}
+                                <a class="preview-link" href="{{ url_for('documents.edit_document_content', document_id=file.id) }}">Edit Content</a>
+                            {% endif %}
 
                             <form method="POST"
                                   action="{{ url_for('documents.edit_document', document_id=file.id) }}"
@@ -689,3 +693,4 @@ body {
 
 </body>
 </html>
+

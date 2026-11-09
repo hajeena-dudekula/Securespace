@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SecureSpace | Edit Document</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    font-family:"Segoe UI",Arial,sans-serif;
+    background:#f4f5fb;
+    color:#1c1b3a;
+    min-height:100vh;
+}
+.navbar {
+    background:white;
+    padding:20px 50px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 3px 15px #0000000a;
+}
+.logo { font-size:25px; font-weight:800; color:#5426c7; }
+.back { color:#5426c7; text-decoration:none; font-weight:600; }
+.container { max-width:950px; margin:45px auto; padding:20px; }
+.heading { margin-bottom:25px; }
+.heading h1 { font-size:30px; margin-bottom:8px; }
+.heading p { color:#777; }
+.editor-card {
+    background:white;
+    padding:30px;
+    border-radius:22px;
+    box-shadow:0 8px 30px #00000009;
+}
+.document-name {
+    font-size:17px;
+    font-weight:700;
+    margin-bottom:18px;
+    color:#5426c7;
+    overflow-wrap:anywhere;
+}
+textarea {
+    width:100%;
+    min-height:420px;
+    padding:18px;
+    border:1px solid #ddd5f5;
+    border-radius:12px;
+    outline:none;
+    resize:vertical;
+    font-family:Consolas,monospace;
+    font-size:15px;
+    line-height:1.7;
+    color:#25243b;
+    background:#fdfcff;
+}
+textarea:focus {
+    border-color:#5426c7;
+    box-shadow:0 0 0 3px #5426c71a;
+}
+.actions {
+    display:flex;
+    gap:12px;
+    justify-content:flex-end;
+    margin-top:22px;
+}
+button,.cancel {
+    padding:12px 24px;
+    border-radius:9px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    text-decoration:none;
+}
+button { border:none; color:white; background:#5426c7; }
+button:hover { background:#4320a5; }
+.cancel { background:#eeeaf7; color:#5426c7; }
+.notice {
+    margin-bottom:18px;
+    padding:12px 15px;
+    border-radius:9px;
+    background:#f5f0ff;
+    color:#5426c7;
+    font-size:13px;
+}
+@media (max-width:600px) {
+    .navbar { padding:18px 20px; }
+    .container { margin:20px auto; }
+    .editor-card { padding:20px; }
+    .actions { flex-direction:column; }
+    button,.cancel { text-align:center; }
+}
+</style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="logo">SecureSpace</div>
+    <a class="back" href="{{ url_for('documents.document_list') }}">← Back to Documents</a>
+</nav>
+<main class="container">
+    <div class="heading">
+        <h1>Edit Document</h1>
+        <p>Make your changes and save the updated document securely.</p>
+    </div>
+    <section class="editor-card">
+        <div class="document-name">{{ document.filename }}</div>
+        <div class="notice">
+            {% if document.filename.rsplit(".", 1)[-1].lower() == "pdf" %}
+                PDF text has been extracted for editing. Saving creates a regenerated PDF.
+                Original formatting, images, tables and fonts may not be preserved.
+                A private backup of the original PDF will be retained.
+            {% else %}
+                Changes will be saved to the original TXT document.
+            {% endif %}
+            Your editing activity will be recorded in the security audit log.
+        </div>
+        <form method="POST" action="{{ url_for('documents.save_document_content', document_id=document.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <textarea name="content" required spellcheck="false">{{ content }}</textarea>
+            <div class="actions">
+                <a class="cancel" href="{{ url_for('documents.document_list') }}">Cancel</a>
+                <button type="submit">Save Changes</button>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

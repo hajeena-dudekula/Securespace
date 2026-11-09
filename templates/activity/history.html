@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -71,7 +71,7 @@ td { color:var(--text); font-size:14px; }
                 <tr>
                     <td>{{ activity.action|replace("_", " ")|title }}</td>
                     <td>{{ activity.details or "?" }}</td>
-                    <td>{{ activity.created_at.strftime("%d %b %Y, %I:%M %p") if activity.created_at else "?" }}</td>
+                    <td>{{ activity.display_created_at.strftime("%d %b %Y, %I:%M %p") if activity.created_at else "?" }}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -81,7 +81,10 @@ td { color:var(--text); font-size:14px; }
     {% endif %}
     </div>
 
-    <a class="back" href="{{ url_for('dashboard') }}">? Back to Dashboard</a>
+    <a class="back" href="{{ url_for('dashboard') }}">Back to Dashboard</a>
 </div>
 </body>
 </html>
+
+
+
